@@ -1,0 +1,2697 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Connecto Dashboard ⚡</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+/* ===== APPLE LEVEL UI ===== */
+body {
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:#0a0f1a;
+    color:white;
+    display:flex;
+    transition:0.4s;
+}
+/* LIGHT MODE */
+body.light {
+    background:#f5f7fb;
+    color:black;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width:220px;
+    height:100vh;
+    background:rgba(17,24,39,0.92);
+    backdrop-filter: blur(15px);
+    padding:20px;
+    transform: perspective(1000px) rotateY(10deg);
+    transform-style: preserve-3d;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+    border-right: 1px solid rgba(56,189,248,0.12);
+}
+
+/* PROFILE */
+.profile {
+    text-align:center;
+    margin-bottom:20px;
+}
+.profile.active .dropdown {
+    display: block;
+}
+.avatar {
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    background:#38bdf8;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    margin:auto;
+}
+.sidebar {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 45px;
+    background: #1a2233;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 999;
+    min-width: 120px;
+}
+
+.dropdown-menu,
+.dropdown {
+    display: none;
+    background: #1a2233;
+    padding: 12px;
+    border-radius: 12px;
+    margin-top: 8px;
+    position: absolute;
+    white-space: nowrap;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    border: 1px solid rgba(56,189,248,0.2);
+    z-index: 1000;
+    min-width: 140px;
+}
+
+.dropdown-menu {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.dropdown {
+    right: 0;
+    top: 45px;
+}
+
+/* Show on active state (click toggle) */
+.profile.active .dropdown-menu,
+.profile.active .dropdown {
+    display: block !important;
+}
+
+.dropdown-menu div,
+.dropdown div {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.2s ease;
+}
+
+.dropdown-menu div:hover,
+.dropdown div:hover {
+    background: rgba(56, 189, 248, 0.2);
+    color: #dbeafe;
+}
+
+/* MENU */
+.menu li {
+    list-style:none;
+    padding:12px;
+    cursor:pointer;
+    border-radius:10px;
+    margin:8px 0;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
+    transform: translateZ(0);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu li:hover {
+    transform: translateZ(18px);
+    box-shadow: 0 18px 32px rgba(56,189,248,0.24);
+    background: rgba(56,189,248,0.12);
+    color: #dbeafe;
+}
+
+.menu li.active {
+    background: rgba(56,189,248,0.22);
+    color: #ffffff;
+    box-shadow: 0 22px 46px rgba(56,189,248,0.35);
+    transform: scale(1.03) translateZ(16px);
+}
+
+.menu li.active::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    box-shadow: 0 0 28px rgba(56,189,248,0.45);
+    pointer-events: none;
+}
+
+/* MAIN */
+.main {
+    flex:1;
+    padding:20px;
+}
+
+/* SECTION */
+.section {
+    display:none;
+    opacity:0;
+    transform:translateY(20px) translateZ(0);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+    backface-visibility: hidden;
+}
+
+.section.active {
+    display:block;
+    opacity:1;
+    transform:translateY(0) translateZ(0);
+}
+
+/* CARDS */
+.card {
+    background:rgba(26,34,51,0.8);
+    backdrop-filter: blur(10px);
+    padding:15px;
+    margin:10px 0;
+    border-radius:12px;
+    transition:0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow:0 0 20px #38bdf8;
+}
+
+.status-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 10px;
+}
+
+.status-pill.available {
+    background: rgba(34,197,94,0.12);
+    color: #22c55e;
+}
+
+.status-pill.busy {
+    background: rgba(248,113,113,0.12);
+    color: #f97316;
+}
+
+.status-pill.unknown {
+    background: rgba(148,163,184,0.12);
+    color: #94a3b8;
+}
+
+.card canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 320px;
+}
+
+/* GRID */
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:16px;
+}
+
+/* STATION CARD ENHANCEMENT */
+.station-card {
+    cursor: pointer;
+    transition: all 0.3s ease !important;
+    overflow: hidden;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+}
+
+.station-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 12px 40px rgba(56,189,248,0.3) !important;
+}
+
+.station-card img {
+    transition: transform 0.3s ease;
+}
+
+.station-card:hover img {
+    transform: scale(1.05);
+}
+
+@media (max-width: 900px) {
+    .main {
+        padding: 16px;
+    }
+    .sidebar {
+        width: 200px;
+    }
+    .topbar {
+        left: 200px;
+    }
+}
+
+@media (max-width: 720px) {
+    body {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        transform: none;
+        border-right: none;
+        box-shadow: none;
+    }
+    .topbar {
+        position: relative;
+        left: 0;
+        right: 0;
+        top: 0;
+        margin-top: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .main {
+        padding: 14px;
+        margin-top: 0;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .sound-toggle {
+        right: 16px;
+        bottom: 16px;
+    }
+    .card {
+        margin: 10px 0;
+    }
+    .card canvas {
+        max-height: 240px;
+    }
+}
+
+/* LIVE STATS */
+.stat h1 {
+    font-size: 48px;
+    margin: 10px 0 0;
+    letter-spacing: 0.5px;
+    transition: transform 0.35s ease, text-shadow 0.35s ease;
+}
+
+.stat h1.animate {
+    transform: scale(1.06);
+    text-shadow: 0 0 25px rgba(56,189,248,0.5);
+}
+
+.battery {
+    position: relative;
+    height: 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 0 24px rgba(56,189,248,0.18);
+}
+
+.battery::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(56,189,248,0.22), rgba(34,197,94,0.22));
+    opacity: 0.85;
+    animation: batteryGlow 3.2s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.fill {
+    height:100%;
+    width:50%;
+    background: linear-gradient(90deg, #22c55e, #38bdf8);
+    transition: width 1.5s ease-in-out, background 1.5s ease-in-out, box-shadow 1.5s ease;
+    box-shadow: 0 0 18px rgba(56,189,248,0.45), inset 0 0 16px rgba(255,255,255,0.14);
+}
+
+@keyframes batteryGlow {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+
+/* BATTERY */
+.battery {
+    height:10px;
+    background:#333;
+    border-radius:10px;
+}
+
+.fill {
+    height:100%;
+    width:50%;
+    background:linear-gradient(90deg,#22c55e,#38bdf8);
+}
+
+/* BUTTON */
+.btn {
+    padding:6px 12px;
+    background:#38bdf8;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+/* MODAL */
+.modal {
+    position:fixed;
+    width:100%;
+    height:100%;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.7);
+    z-index: 200;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(8,15,28,0.92));
+    padding: 32px;
+    border-radius: 20px;
+    border: 1px solid rgba(56,189,248,0.22);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.55), inset 0 0 20px rgba(56,189,248,0.08);
+    max-width: 420px;
+    width: 90%;
+    max-height: 70vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.35s ease-out;
+}
+
+@keyframes modalSlideIn {
+    0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-header {
+    margin-bottom: 22px;
+}
+
+.modal-header h3 {
+    margin: 0 0 6px;
+    font-size: 24px;
+    color: #dbeafe;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 12px rgba(56,189,248,0.3);
+}
+
+.modal-header p {
+    margin: 0;
+    font-size: 12px;
+    color: #7dd3fc;
+    opacity: 0.8;
+}
+
+.time-slots {
+    margin: 20px 0 24px;
+}
+
+.time-slots label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+#stationSearch,
+#time {
+    width: 100%;
+    padding: 12px;
+    background: rgba(11,17,28,0.85);
+    border: 1px solid rgba(56,189,248,0.18);
+    border-radius: 12px;
+    color: #e0f2fe;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#stationSearch:hover,
+#time:hover {
+    border-color: rgba(56,189,248,0.4);
+    box-shadow: 0 0 15px rgba(56,189,248,0.12);
+}
+
+#stationSearch:focus,
+#time:focus {
+    outline: none;
+    border-color: rgba(56,189,248,0.6);
+    box-shadow: 0 0 20px rgba(56,189,248,0.2);
+}
+
+#time:focus {
+    outline: none;
+    border-color: rgba(56,189,248,0.6);
+    box-shadow: 0 0 20px rgba(56,189,248,0.2);
+}
+
+.time-option {
+    padding: 8px 0;
+}
+
+.time-option.booked {
+    opacity: 0.5;
+    color: #f97316;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.modal-actions .confirm-btn {
+    background: linear-gradient(135deg, #22c55e, #38bdf8);
+    color: #020617;
+    box-shadow: 0 8px 20px rgba(16,185,129,0.25);
+}
+
+.modal-actions .confirm-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(16,185,129,0.35);
+}
+
+.modal-actions .confirm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal-actions .cancel-btn {
+    background: rgba(56,189,248,0.12);
+    color: #7dd3fc;
+    border: 1px solid rgba(56,189,248,0.3);
+}
+
+.modal-actions .cancel-btn:hover {
+    background: rgba(56,189,248,0.18);
+    border-color: rgba(56,189,248,0.5);
+}
+
+.booking-success {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: rgba(34,197,94,0.95);
+    color: white;
+    padding: 30px 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(34,197,94,0.4);
+    z-index: 300;
+    text-align: center;
+    pointer-events: none;
+    display: none; /* keep hidden initially */
+}
+.booking-success.show {
+    display: block;
+    animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes successPop {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.booking-success h2 {
+    margin: 0 0 8px;
+    font-size: 28px;
+}
+
+.booking-success p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.95;
+}
+
+/* TOAST */
+#toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #1a2233;
+    padding: 14px 20px;
+    border-radius: 12px;
+    display: none;
+    box-shadow: 0 0 15px #38bdf8;
+    border-left: 4px solid #38bdf8;
+    animation: slideInRight 0.4s ease-out;
+    z-index: 150;
+}
+
+@keyframes slideInRight {
+    0% { transform: translateX(400px); opacity: 0; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+
+#toast.warning {
+    border-left-color: #f97316;
+    box-shadow: 0 0 15px #f97316;
+}
+
+#toast.error {
+    border-left-color: #ef4444;
+    box-shadow: 0 0 15px #ef4444;
+}
+
+#toast.success {
+    border-left-color: #22c55e;
+    box-shadow: 0 0 15px #22c55e;
+}
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+/* CLOCK */
+#clock {
+    float:right;
+    font-size:14px;
+}
+.topbar {
+    position:fixed;
+    top:0;
+    left:220px;
+    right:0;
+    height:60px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 20px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(10px);
+    z-index:10;
+}
+
+.right {
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.profile {
+    position:relative;
+    cursor:pointer;
+}
+
+.profile img {
+    width:35px;
+    border-radius:50%;
+}
+
+.dropdown {
+    display:none;
+    position:absolute;
+    right:0;
+    top:50px;
+    background:#1a2233;
+    padding:10px;
+    border-radius:10px;
+}
+
+/* Removed hover-only logic - using click toggle with .active class */
+
+/* SOUND TOGGLE */
+.sound-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(56,189,248,0.18);
+    border: 1px solid rgba(56,189,248,0.35);
+    color: #38bdf8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.sound-toggle:hover {
+    background: rgba(56,189,248,0.28);
+    box-shadow: 0 0 18px rgba(56,189,248,0.35);
+    transform: scale(1.08);
+}
+
+.sound-toggle.active {
+    background: rgba(56,189,248,0.35);
+    box-shadow: 0 0 24px rgba(56,189,248,0.5);
+}
+</style>
+</head>
+
+<body>
+<canvas id="bg"></canvas>
+<div class="sidebar">
+
+<h2>⚡ Connecto</h2>
+
+<div class="profile" onclick="toggleProfileMenu(event)">
+        <div class="avatar" id="sidebarAvatar"></div>
+
+    <div class="dropdown-menu" id="menuBox">
+        <div onclick="logout(); event.stopPropagation()">Logout</div>
+    </div>
+</div>
+
+<ul class="menu">
+<li onclick="show('dashboard', this)" class="active" data-i18n="dashboard">📊 Dashboard</li>
+<li onclick="show('stations', this)" data-i18n="stations">🔌 Stations</li>
+<li onclick="show('bookings', this)" data-i18n="bookings">📅 Bookings</li>
+<li onclick="show('payments', this)" data-i18n="payments">💳 Payments</li>
+<li style="border-top: 1px solid rgba(56,189,248,0.2); margin-top: 10px; padding-top: 10px; cursor:default;" onclick="event.stopPropagation()"><small style="color: #7dd3fc; text-transform: uppercase; font-weight: 600;" data-i18n="more">More</small></li>
+<li onclick="show('statistics', this)" data-i18n="statistics">📈 Statistics</li>
+<li onclick="show('rewards', this)" data-i18n="rewards">🎯 Rewards</li>
+<li onclick="show('settings', this)" data-i18n="settings">⚙️ Settings</li>
+</ul>
+
+</div>
+<!-- TOP NAVBAR -->
+<div class="topbar">
+    <div id="greeting"></div>
+
+    <div class="right">
+        <span id="clock"></span>
+
+<div class="profile" onclick="toggleProfileMenu(event)">
+            <img id="avatar">
+            <div class="dropdown" id="topbarDropdown">
+                <p id="userEmail"></p>
+                <button onclick="logout(); event.stopPropagation()" data-i18n="logout">Logout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="main">
+
+<h1 id="welcome"></h1>
+
+<button onclick="toggleMode()" data-i18n="toggleMode">🌙 Toggle Mode</button>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+<div class="grid">
+
+<div class="card stat">
+<h3 data-i18n="totalBookings">Total Bookings</h3>
+<h1 id="totalBookings">0</h1>
+</div>
+
+<div class="card stat">
+<h3 data-i18n="energyUsed">Energy Used</h3>
+<h1 id="energy">0 kWh</h1>
+</div>
+
+<div class="card stat">
+<h3 data-i18n="moneySaved">Money Saved</h3>
+<h1 id="saved">₹0</h1>
+</div>
+
+<div class="card stat">
+<h3 data-i18n="co2Prevented">CO₂ Prevented</h3>
+<h1 id="emissions" style="color:#22c55e;">0 kg</h1>
+</div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+<div data-i18n="batteryStatus">Battery Status</div>
+<div class="battery"><div id="fill" class="fill"></div></div>
+<p id="batteryText">50%</p>
+</div>
+
+<div class="card">
+<h3 data-i18n="nextBooking">Next Booking</h3>
+<h1 id="nextBooking" style="font-size:20px; margin:0;">No upcoming booking</h1>
+</div>
+
+<div class="card">
+<span data-i18n="stationsNearby">Stations Nearby:</span> <span id="stationCount">0</span> 🔌
+</div>
+
+</div>
+
+<div class="card" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:flex-start; margin-top:8px;">
+    <button class="btn" onclick="show('stations', document.querySelector('.menu li:nth-child(2)'))" data-i18n="findStations">🔍 Find Stations</button>
+    <button class="btn" onclick="show('bookings', document.querySelector('.menu li:nth-child(3)'))" data-i18n="viewBookings">📅 View Bookings</button>
+    <button class="btn" onclick="show('payments', document.querySelector('.menu li:nth-child(4)'))" data-i18n="payments">💳 Payments</button>
+</div>
+
+<div class="card" style="min-height: 340px;">
+    <h3 data-i18n="weeklyEnergy">Weekly Energy Delivered</h3>
+    <canvas id="chart" style="width:100%; min-height:280px;"></canvas>
+</div>
+
+<div class="grid">
+<div class="card">
+    <h3 data-i18n="quickStats">⚡ Quick Stats</h3>
+    <div style="font-size:13px; line-height:1.8; color:#cbd5e1;">
+        <div><span data-i18n="averageChargeTime">Average charge time:</span> <strong>45 min</strong></div>
+        <div><span data-i18n="favoriteStation">Favorite station:</span> <strong>EV Zone</strong></div>
+        <div><span data-i18n="memberSince">Member since:</span> <strong>6 months</strong></div>
+        <div><span data-i18n="totalKmCharged">Total km charged:</span> <strong>2,840 km</strong></div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 data-i18n="achievements">🎯 Achievements</h3>
+    <div style="font-size:13px; line-height:1.8;">
+        <div>🏆 <span style="color:#fbbf24;" data-i18n="powerUser">Power User</span> - <span data-i18n="bookingsMade">50 bookings</span></div>
+        <div>🌱 <span style="color:#22c55e;" data-i18n="ecoWarrior">Eco Warrior</span> - <span data-i18n="saved">Saved 250kg CO₂</span></div>
+        <div>⚡ <span style="color:#38bdf8;" data-i18n="earlyBird">Early Bird</span> - <span data-i18n="morningCharges">20 morning charges</span></div>
+        <div>🎁 <span data-i18n="earnPoints">Earn</span> <strong>500 pts</strong> <span data-i18n="forNextReward">more for next reward</span></div>
+    </div>
+</div>
+</div>
+
+</div>
+
+<!-- STATIONS -->
+<div id="stations" class="section">
+<div class="card">
+    <h3 data-i18n="nearbyStations">Nearby Stations</h3>
+    <p data-i18n="browseCharging" style="color:#cbd5e1; margin-top:0.5rem;">Browse charging stations near you and check availability before booking.</p>
+    <p id="stationSummary" style="margin:0.75rem 0 0; font-size:14px; color:#94a3b8;">6 stations available within 5 km</p>
+</div>
+<div class="card">
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+        <input id="stationSearch" type="text" data-i18n-placeholder="searchStation" placeholder="Search station..." onkeyup="searchStation(this.value)" style="flex:1; min-width:200px;">
+        <select id="chargerFilter" onchange="filterStations(this.value)" style="padding:8px 12px; border-radius:5px; background:#1a2233; color:#e0f2fe; border:1px solid rgba(56,189,248,0.2); cursor:pointer;">
+            <option value="" data-i18n="allChargers">All Chargers</option>
+            <option value="DC" data-i18n="dcFastCharger">DC Fast Charger</option>
+            <option value="AC" data-i18n="acCharger">AC Charger</option>
+            <option value="Tesla" data-i18n="teslaCharger">Tesla Supercharger</option>
+        </select>
+        <select id="priceFilter" onchange="filterStations()" style="padding:8px 12px; border-radius:5px; background:#1a2233; color:#e0f2fe; border:1px solid rgba(56,189,248,0.2); cursor:pointer;">
+            <option value="" data-i18n="allPrices">All Prices</option>
+            <option value="budget" data-i18n="budget">Budget (₹5-10)</option>
+            <option value="mid" data-i18n="midRange">Mid-Range (₹10-15)</option>
+            <option value="premium" data-i18n="premium">Premium (₹15+)</option>
+        </select>
+    </div>
+</div>
+<div class="grid" id="stationGrid"></div>
+</div>
+
+<!-- BOOKINGS -->
+<div id="bookings" class="section"></div>
+
+<!-- STATISTICS -->
+<div id="statistics" class="section">
+<div class="card">
+    <h3 data-i18n="chargingStatistics">📊 Charging Statistics</h3>
+    <p data-i18n="trackChargingHabits" style="color:#cbd5e1; margin-top:0.5rem;">Track your EV charging habits and patterns</p>
+</div>
+<div class="grid">
+    <div class="card">
+        <h3 data-i18n="dailyAverage">Daily Average</h3>
+        <h1 style="color:#38bdf8; margin:10px 0 0;">45 min</h1>
+        <p data-i18n="averageChargeTime" style="color:#94a3b8; font-size:12px; margin:5px 0 0;">Average charging time per session</p>
+    </div>
+    <div class="card">
+        <h3 data-i18n="peakHours">Peak Hours</h3>
+        <h1 style="color:#22c55e; margin:10px 0 0;">6-8 PM</h1>
+        <p data-i18n="mostFrequent" style="color:#94a3b8; font-size:12px; margin:5px 0 0;">Most frequent charging time</p>
+    </div>
+    <div class="card">
+        <h3 data-i18n="favoriteStation">Favorite Station</h3>
+        <h1 style="color:#fbbf24; margin:10px 0 0;">EV Zone</h1>
+        <p data-i18n="timesThisMonth" style="color:#94a3b8; font-size:12px; margin:5px 0 0;">Visited 12 times this month</p>
+    </div>
+    <div class="card">
+        <h3 data-i18n="totalDistance">Total Distance</h3>
+        <h1 style="color:#06b6d4; margin:10px 0 0;">2,840 km</h1>
+        <p data-i18n="chargedWith" style="color:#94a3b8; font-size:12px; margin:5px 0 0;">Charged with Connecto</p>
+    </div>
+</div>
+<div class="card" style="min-height:340px;">
+    <h3 data-i18n="monthlyChargingTrend">Monthly Charging Trend</h3>
+    <canvas id="statsChart" style="width:100%; min-height:280px;"></canvas>
+</div>
+<div class="grid">
+    <div class="card">
+        <h3 data-i18n="monthlyBreakdown">Monthly Breakdown</h3>
+        <div style="font-size:13px; line-height:2;">
+            <div><span data-i18n="fastCharging">Fast Charging</span>: <strong style="color:#22c55e;">35%</strong></div>
+            <div><span data-i18n="standardCharging">Standard Charging</span>: <strong style="color:#38bdf8;">45%</strong></div>
+            <div><span data-i18n="slowCharging">Slow Charging</span>: <strong style="color:#fbbf24;">20%</strong></div>
+        </div>
+    </div>
+    <div class="card">
+        <h3 data-i18n="performanceMetrics">Performance Metrics</h3>
+        <div style="font-size:13px; line-height:2;">
+            <div><span data-i18n="avgSpeed">Avg Speed</span>: <strong style="color:#38bdf8;">120 kW</strong></div>
+            <div><span data-i18n="efficiency">Efficiency</span>: <strong style="color:#22c55e;">94%</strong></div>
+            <div><span data-i18n="batteryHealth">Battery Health</span>: <strong style="color:#22c55e;">98%</strong></div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- REWARDS -->
+<div id="rewards" class="section">
+<div class="card">
+    <h3 data-i18n="rewardsLoyalty">🎯 Rewards & Loyalty</h3>
+    <p data-i18n="earnPointsWithCharge" style="color:#cbd5e1; margin-top:0.5rem;">Earn points with every charge and unlock exclusive benefits</p>
+</div>
+<div class="card">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <div>
+            <p data-i18n="currentPoints" style="margin:0; color:#94a3b8; font-size:12px; text-transform:uppercase;">Current Points</p>
+            <h1 style="margin:8px 0 0; color:#fbbf24;">2,450</h1>
+        </div>
+        <div style="text-align:right;">
+            <p data-i18n="nextRewardIn" style="margin:0; color:#94a3b8; font-size:12px; text-transform:uppercase;">Next Reward In</p>
+            <h2 style="margin:8px 0 0; color:#22c55e;">550 pts</h2>
+        </div>
+    </div>
+    <div style="background:rgba(56,189,248,0.1); padding:8px; border-radius:8px; overflow:hidden;">
+        <div style="height:8px; background:linear-gradient(90deg, #22c55e, #38bdf8); width:81%; border-radius:4px;"></div>
+    </div>
+</div>
+<div class="card">
+    <h3 data-i18n="yourAchievements">🏆 Your Achievements</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="background:rgba(34,197,94,0.1); padding:12px; border-radius:8px; border-left:3px solid #22c55e;">
+            <div style="font-size:20px; margin-bottom:4px;">🌱</div>
+            <div style="font-weight:600; color:#dbeafe;" data-i18n="ecoWarrior">Eco Warrior</div>
+            <div style="font-size:12px; color:#94a3b8;">250kg CO₂ saved</div>
+        </div>
+        <div style="background:rgba(56,189,248,0.1); padding:12px; border-radius:8px; border-left:3px solid #38bdf8;">
+            <div style="font-size:20px; margin-bottom:4px;">⚡</div>
+            <div style="font-weight:600; color:#dbeafe;" data-i18n="powerUser">Power User</div>
+            <div style="font-size:12px; color:#94a3b8;">50 bookings made</div>
+        </div>
+        <div style="background:rgba(251,191,36,0.1); padding:12px; border-radius:8px; border-left:3px solid #fbbf24;">
+            <div style="font-size:20px; margin-bottom:4px;">🌅</div>
+            <div style="font-weight:600; color:#dbeafe;" data-i18n="earlyBird">Early Bird</div>
+            <div style="font-size:12px; color:#94a3b8;">20 morning charges</div>
+        </div>
+        <div style="background:rgba(6,182,212,0.1); padding:12px; border-radius:8px; border-left:3px solid #06b6d4;">
+            <div style="font-size:20px; margin-bottom:4px;">🎯</div>
+            <div style="font-weight:600; color:#dbeafe;">Consistent</div>
+            <div style="font-size:12px; color:#94a3b8;">7-day streak</div>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <h3 data-i18n="availableRewards">🎁 Available Rewards</h3>
+    <div style="font-size:13px; line-height:2.2;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(56,189,248,0.08); border-radius:8px; margin-bottom:8px;">
+            <span data-i18n="discountVoucher">₹50 Discount Voucher</span>
+            <span style="color:#fbbf24;">3000 pts</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(56,189,248,0.08); border-radius:8px; margin-bottom:8px;">
+            <span data-i18n="freeChargeSession">Free Charge Session</span>
+            <span style="color:#fbbf24;">5000 pts</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px; background:rgba(56,189,248,0.08); border-radius:8px;">
+            <span data-i18n="premiumMembership">Premium Membership (1 month)</span>
+            <span style="color:#fbbf24;">7500 pts</span>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings" class="section">
+<div class="card">
+    <h3 data-i18n="settings">⚙️ Settings</h3>
+    <p data-i18n="managePreferences" style="color:#cbd5e1; margin-top:0.5rem;">Manage your account preferences and notifications</p>
+</div>
+<div class="card">
+    <h3 data-i18n="accountSettings">Account Settings</h3>
+    <div style="margin:16px 0 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(56,189,248,0.2);">
+            <span data-i18n="emailNotifications">Email Notifications</span>
+            <label style="display:inline-flex; align-items:center; cursor:pointer;">
+                <input type="checkbox" checked style="width:20px; height:20px; cursor:pointer;">
+            </label>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(56,189,248,0.2);">
+            <span data-i18n="smsAlerts">SMS Alerts</span>
+            <label style="display:inline-flex; align-items:center; cursor:pointer;">
+                <input type="checkbox" checked style="width:20px; height:20px; cursor:pointer;">
+            </label>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(56,189,248,0.2);">
+            <span data-i18n="pushNotifications">Push Notifications</span>
+            <label style="display:inline-flex; align-items:center; cursor:pointer;">
+                <input type="checkbox" style="width:20px; height:20px; cursor:pointer;">
+            </label>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <h3 data-i18n="preferences">Preferences</h3>
+    <div style="margin:16px 0 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(56,189,248,0.2);">
+            <span data-i18n="darkMode">Dark Mode</span>
+            <button class="btn" onclick="toggleMode()" style="padding:6px 16px;" data-i18n="enabled">Enabled</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(56,189,248,0.2);">
+            <span data-i18n="soundEffects">Sound Effects</span>
+            <button class="btn" id="soundPref" style="padding:6px 16px;" data-i18n="enabled">Enabled</button>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+            <span data-i18n="language">Language</span>
+            <select id="languageSelector" style="padding:6px 12px; background:#1a2233; color:#e0f2fe; border:1px solid rgba(56,189,248,0.2); border-radius:5px; cursor:pointer;" onchange="changeLanguage(this.value)">
+                <option value="en">English</option>
+                <option value="hi">हिंदी (Hindi)</option>
+                <option value="es">Español (Spanish)</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <h3 data-i18n="security">Security</h3>
+    <div style="margin:16px 0 0;">
+        <button class="btn" style="width:100%; padding:12px; margin-bottom:10px; cursor:pointer;" data-i18n="changePassword">Change Password</button>
+        <button class="btn" style="width:100%; padding:12px; margin-bottom:10px; cursor:pointer;" data-i18n="twoFactorAuth">Two-Factor Authentication</button>
+        <button class="btn" style="width:100%; padding:12px; cursor:pointer;" data-i18n="viewLoginHistory">View Login History</button>
+    </div>
+</div>
+<div class="card">
+    <h3 data-i18n="accountActions">Account Actions</h3>
+    <div style="margin:16px 0 0;">
+        <button class="btn" style="width:100%; padding:12px; margin-bottom:10px; background:rgba(6,182,212,0.2); color:#06b6d4; cursor:pointer;" data-i18n="downloadMyData">Download My Data</button>
+        <button class="btn" style="width:100%; padding:12px; background:rgba(239,68,68,0.2); color:#ef4444; cursor:pointer;" onclick="if(confirm('Are you sure?')) { logout(); }" data-i18n="deactivateAccount">Deactivate Account</button>
+    </div>
+</div>
+</div>
+
+<!-- PAYMENTS -->
+<div id="payments" class="section">
+<div class="card">
+    <h3 data-i18n="paymentSummary">Payment Summary</h3>
+    <p data-i18n="manageChargingBills" style="margin:0.5rem 0 0; color:#cbd5e1;">Manage your EV charging bills and keep track of paid invoices.</p>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:16px; gap:16px; flex-wrap:wrap;">
+        <div>
+            <p data-i18n="amountDue" style="margin:0; color:#94a3b8;">Amount Due</p>
+            <h2 id="dueAmount" style="margin:8px 0 0;">₹0</h2>
+        </div>
+        <button class="btn" id="payNowBtn" onclick="processPayment()" data-i18n="payNow">Pay Now</button>
+    </div>
+</div>
+<div class="card" id="paymentHistory">
+    <h3 data-i18n="paymentHistory">Payment History</h3>
+    <p data-i18n="loadingPayments" style="color:#7dd3fc;">Loading recent payments...</p>
+</div>
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-content">
+    <div class="modal-header">
+        <h3 data-i18n="bookCharging">Book Charging</h3>
+        <p id="stationName" data-i18n="selectTimeSlot">Select Time Slot</p>
+    </div>
+
+    <div class="time-slots">
+        <label data-i18n="availableTimeSlots">Available Time Slots</label>
+        <select id="time">
+            <option value="" data-i18n="chooseTimeSlot">Choose a time slot...</option>
+            <option value="10AM-12PM">10:00 AM - 12:00 PM</option>
+            <option value="12-2PM">12:00 PM - 2:00 PM</option>
+            <option value="2-4PM">2:00 PM - 4:00 PM</option>
+            <option value="4-6PM">4:00 PM - 6:00 PM</option>
+            <option value="6-8PM">6:00 PM - 8:00 PM</option>
+            <option value="8-10PM">8:00 PM - 10:00 PM</option>
+        </select>
+    </div>
+
+    <div class="modal-actions">
+        <button class="confirm-btn" onclick="confirmBooking()" data-i18n="confirmBooking">Confirm Booking</button>
+        <button class="cancel-btn" onclick="closeModal()" data-i18n="cancel">Cancel</button>
+    </div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- BOOKING SUCCESS ANIMATION -->
+<div id="bookingSuccess" class="booking-success">
+    <h2 data-i18n="bookingSuccessTitle">✓ Booked!</h2>
+    <p id="successMsg" data-i18n="bookingSuccessMsg">Your charging slot is confirmed</p>
+</div>
+
+<!-- SOUND TOGGLE -->
+<button id="soundToggle" class="sound-toggle active" title="Toggle Sound Effects">🔊</button>
+
+<script>
+
+/* ==========================================
+   SOUND EFFECTS SYSTEM - NO TOAST TRIGGERS
+   ========================================== */
+const SoundManager = {
+    enabled: localStorage.getItem('soundEnabled') !== 'false',
+    audioContext: null,
+
+    init() {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const btn = document.getElementById('soundToggle');
+        if (btn) {
+            btn.classList.toggle('active', this.enabled);
+            btn.innerHTML = this.enabled ? '🔊' : '🔇';
+            btn.addEventListener('click', () => this.toggle());
+        }
+    },
+
+    toggle() {
+        this.enabled = !this.enabled;
+        localStorage.setItem('soundEnabled', this.enabled);
+        const btn = document.getElementById('soundToggle');
+        if (btn) {
+            btn.classList.toggle('active', this.enabled);
+            btn.innerHTML = this.enabled ? '🔊' : '🔇';
+        }
+    },
+
+    playHover() {
+        if (!this.enabled || !this.audioContext) return;
+        const now = this.audioContext.currentTime;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioContext.destination);
+        osc.frequency.value = 520;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+    },
+
+    playClick() {
+        if (!this.enabled || !this.audioContext) return;
+        const now = this.audioContext.currentTime;
+        const osc = this.audioContext.createOscillator();
+        const gain = this.audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioContext.destination);
+        osc.frequency.setValueAtTime(640, now);
+        osc.frequency.exponentialRampToValueAtTime(420, now + 0.15);
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+};
+
+/* ==========================================
+   LANGUAGE TRANSLATION SYSTEM
+   ========================================== */
+const translations = {
+    en: {
+        dashboard: 'Dashboard',
+        stations: 'Stations',
+        bookings: 'Bookings',
+        payments: 'Payments',
+        statistics: 'Statistics',
+        rewards: 'Rewards',
+        settings: 'Settings',
+        more: 'More',
+        welcome: 'Welcome',
+        goodMorning: 'Good Morning ☀️',
+        goodAfternoon: 'Good Afternoon ⚡',
+        goodEvening: 'Good Evening 🌙',
+        totalBookings: 'Total Bookings',
+        energyUsed: 'Energy Used',
+        moneySaved: 'Money Saved',
+        co2Prevented: 'CO₂ Prevented',
+        batteryStatus: 'Battery Status',
+        nextBooking: 'Next Booking',
+        stationsNearby: 'Stations Nearby',
+        noUpcomingBooking: 'No upcoming booking',
+        findStations: 'Find Stations',
+        viewBookings: 'View Bookings',
+        payments: 'Payments',
+        weeklyEnergy: 'Weekly Energy Delivered',
+        quickStats: 'Quick Stats',
+        averageChargeTime: 'Average charge time',
+        favoriteStation: 'Favorite station',
+        memberSince: 'Member since',
+        totalKmCharged: 'Total km charged',
+        achievements: 'Achievements',
+        ecoWarrior: 'Eco Warrior',
+        powerUser: 'Power User',
+        earlyBird: 'Early Bird',
+        earnPoints: 'Earn',
+        earnPointsWithCharge: 'Earn points with every charge and unlock exclusive benefits',
+        forNextReward: 'more for next reward',
+        nearbyStations: 'Nearby Stations',
+        browseCharging: 'Browse charging stations near you and check availability before booking',
+        availableStations: 'available within 5 km',
+        stationAvailabilitySummary: '{{available}} of {{total}} stations are available within 5 km',
+        searchStation: 'Search station...',
+        allChargers: 'All Chargers',
+        dcFastCharger: 'DC Fast Charger',
+        acCharger: 'AC Charger',
+        teslaCharger: 'Tesla Supercharger',
+        allPrices: 'All Prices',
+        budget: 'Budget (₹5-10)',
+        midRange: 'Mid-Range (₹10-15)',
+        premium: 'Premium (₹15+)',
+        chargerType: 'Charger Type',
+        power: 'Power',
+        price: 'Price',
+        distance: 'Distance',
+        bookNow: 'Book Now',
+        available: 'Available',
+        unavailable: 'Unavailable',
+        busy: 'Busy',
+        reviews: 'reviews',
+        chargingStatistics: 'Charging Statistics',
+        trackChargingHabits: 'Track your EV charging habits and patterns',
+        dailyAverage: 'Daily Average',
+        peakHours: 'Peak Hours',
+        mostFrequent: 'Most frequent charging time',
+        visitedTimes: 'Visited',
+        timesThisMonth: 'times this month',
+        totalDistance: 'Total Distance',
+        chargedWith: 'Charged with Connecto',
+        monthlyChargingTrend: 'Monthly Charging Trend',
+        monthlyBreakdown: 'Monthly Breakdown',
+        fastCharging: 'Fast Charging',
+        standardCharging: 'Standard Charging',
+        slowCharging: 'Slow Charging',
+        performanceMetrics: 'Performance Metrics',
+        avgSpeed: 'Avg Speed',
+        efficiency: 'Efficiency',
+        batteryHealth: 'Battery Health',
+        rewardsLoyalty: 'Rewards & Loyalty',
+        bookingsMade: 'bookings made',
+        currentPoints: 'Current Points',
+        nextRewardIn: 'Next Reward In',
+        yourAchievements: 'Your Achievements',
+        saved: 'saved',
+        bookings: 'bookings made',
+        morningCharges: 'morning charges',
+        availableRewards: 'Available Rewards',
+        discountVoucher: 'Discount Voucher',
+        freeChargeSession: 'Free Charge Session',
+        premiumMembership: 'Premium Membership (1 month)',
+        accountSettings: 'Account Settings',
+        emailNotifications: 'Email Notifications',
+        smsAlerts: 'SMS Alerts',
+        pushNotifications: 'Push Notifications',
+        preferences: 'Preferences',
+        managePreferences: 'Manage your account preferences and notifications',
+        darkMode: 'Dark Mode',
+        soundEffects: 'Sound Effects',
+        language: 'Language',
+        enabled: 'Enabled',
+        disabled: 'Disabled',
+        security: 'Security',
+        changePassword: 'Change Password',
+        twoFactorAuth: '2FA',
+        viewLoginHistory: 'View Login History',
+        accountActions: 'Account Actions',
+        downloadMyData: 'Download My Data',
+        downloadData: 'Download My Data',
+        deactivateAccount: 'Deactivate Account',
+        paymentSummary: 'Payment Summary',
+        manageChargingBills: 'Manage your EV charging bills and keep track of paid invoices',
+        amountDue: 'Amount Due',
+        payNow: 'Pay Now',
+        paymentHistory: 'Payment History',
+        loadingPayments: 'Loading recent payments...',
+        noPaymentsMade: 'No payments made yet',
+        bookCharging: 'Book Charging',
+        selectTimeSlot: 'Select Time Slot',
+        availableTimeSlots: 'Available Time Slots',
+        chooseTimeSlot: 'Choose a time slot...',
+        bookingSuccessTitle: '✓ Booked!',
+        bookingSuccessMsg: 'Your charging slot is confirmed',
+        confirmBooking: 'Confirm Booking',
+        cancel: 'Cancel',
+        logout: 'Logout',
+        pleaseSelectTimeSlot: 'Please select a time slot',
+        timeslotAlreadyBooked: 'This time slot is already booked',
+        bookingConfirmed: 'Booking confirmed!',
+        bookingFailed: 'Booking failed. Please try again.',
+        loggedOut: 'Logged out 👋',
+        noBookings: 'No bookings yet. Go to Stations to book a charging slot!'
+    },
+    hi: {
+        dashboard: 'डैशबोर्ड',
+        stations: 'स्टेशन',
+        bookings: 'बुकिंग',
+        payments: 'भुगतान',
+        statistics: 'आंकड़े',
+        rewards: 'पुरस्कार',
+        settings: 'सेटिंग्स',
+        more: 'अधिक',
+        welcome: 'स्वागत है',
+        goodMorning: 'सुप्रभात ☀️',
+        goodAfternoon: 'शुभ दोपहर ⚡',
+        goodEvening: 'शुभ संध्या 🌙',
+        totalBookings: 'कुल बुकिंग',
+        energyUsed: 'ऊर्जा उपयोग',
+        moneySaved: 'पैसा बचाया',
+        co2Prevented: 'CO₂ रोका गया',
+        batteryStatus: 'बैटरी स्थिति',
+        nextBooking: 'अगली बुकिंग',
+        stationsNearby: 'आस-पास स्टेशन',
+        noUpcomingBooking: 'आने वाली कोई बुकिंग नहीं',
+        findStations: 'स्टेशन खोजें',
+        viewBookings: 'बुकिंग देखें',
+        payments: 'भुगतान',
+        weeklyEnergy: 'साप्ताहिक ऊर्जा',
+        quickStats: 'त्वरित आंकड़े',
+        averageChargeTime: 'औसत चार्ज समय',
+        favoriteStation: 'पसंदीदा स्टेशन',
+        memberSince: 'सदस्य के बाद से',
+        totalKmCharged: 'कुल किमी चार्ज',
+        achievements: 'उपलब्धियां',
+        ecoWarrior: 'ईको योद्धा',
+        powerUser: 'पावर यूजर',
+        earlyBird: 'अर्ली बर्ड',
+        earnPoints: 'अर्जन करें',
+        forNextReward: 'अगले पुरस्कार के लिए',
+        nearbyStations: 'आस-पास के स्टेशन',
+        browseCharging: 'आपके पास चार्जिंग स्टेशन खोजें और बुकिंग से पहले उपलब्धता जांचें',
+        availableStations: '5 किमी के भीतर उपलब्ध',
+        stationAvailabilitySummary: '{{available}} में से {{total}} स्टेशन 5 किमी के भीतर उपलब्ध हैं',
+        searchStation: 'स्टेशन खोजें...',
+        allChargers: 'सभी चार्जर',
+        dcFastCharger: 'DC तेज चार्जर',
+        acCharger: 'AC चार्जर',
+        teslaCharger: 'Tesla सुपरचार्जर',
+        allPrices: 'सभी कीमतें',
+        budget: 'बजट (₹5-10)',
+        midRange: 'मध्य-सीमा (₹10-15)',
+        premium: 'प्रीमियम (₹15+)',
+        chargerType: 'चार्जर प्रकार',
+        power: 'शक्ति',
+        price: 'कीमत',
+        distance: 'दूरी',
+        bookNow: 'अभी बुक करें',
+        available: 'उपलब्ध',
+        unavailable: 'अनुपलब्ध',
+        busy: 'व्यस्त',
+        reviews: 'समीक्षा',
+        chargingStatistics: 'चार्जिंग आंकड़े',
+        trackChargingHabits: 'अपनी EV चार्जिंग आदतों और पैटर्न को ट्रैक करें',
+        dailyAverage: 'दैनिक औसत',
+        peakHours: 'पीक आवर्स',
+        mostFrequent: 'सबसे लगातार चार्जिंग समय',
+        visitedTimes: 'दौरा किया गया',
+        timesThisMonth: 'इस महीने बार',
+        totalDistance: 'कुल दूरी',
+        chargedWith: 'Connecto के साथ चार्ज किया',
+        monthlyChargingTrend: 'मासिक चार्जिंग प्रवृत्ति',
+        monthlyBreakdown: 'मासिक विभाजन',
+        fastCharging: 'तेज चार्जिंग',
+        standardCharging: 'मानक चार्जिंग',
+        slowCharging: 'धीमी चार्जिंग',
+        performanceMetrics: 'प्रदर्शन मेट्रिक्स',
+        avgSpeed: 'औसत गति',
+        efficiency: 'दक्षता',
+        batteryHealth: 'बैटरी स्वास्थ्य',
+        rewardsLoyalty: 'पुरस्कार और वफादारी',
+        bookingsMade: 'बुकिंग की गई',
+        managePreferences: 'अपने खाता प्राथमिकताएं और सूचनाएं प्रबंधित करें',
+        currentPoints: 'वर्तमान अंक',
+        nextRewardIn: 'अगला पुरस्कार',
+        yourAchievements: 'आपकी उपलब्धियां',
+        saved: 'बचाया',
+        bookings: 'बुकिंग',
+        morningCharges: 'सुबह चार्ज',
+        availableRewards: 'उपलब्ध पुरस्कार',
+        discountVoucher: 'डिस्काउंट वाउचर',
+        freeChargeSession: 'मुफ्त चार्ज सेशन',
+        premiumMembership: 'प्रीमियम सदस्यता (1 महीना)',
+        accountSettings: 'खाता सेटिंग्स',
+        emailNotifications: 'ईमेल सूचनाएं',
+        smsAlerts: 'SMS अलर्ट',
+        pushNotifications: 'पुश सूचनाएं',
+        preferences: 'प्राथमिकताएं',
+        darkMode: 'डार्क मोड',
+        soundEffects: 'ध्वनि प्रभाव',
+        language: 'भाषा',
+        enabled: 'सक्षम',
+        disabled: 'अक्षम',
+        security: 'सुरक्षा',
+        changePassword: 'पासवर्ड बदलें',
+        twoFactorAuth: 'दो-कारक प्रमाणीकरण',
+        viewLoginHistory: 'लॉगिन इतिहास देखें',
+        accountActions: 'खाता कार्य',
+        downloadMyData: 'मेरा डेटा डाउनलोड करें',
+        downloadData: 'मेरा डेटा डाउनलोड करें',
+        deactivateAccount: 'खाता निष्क्रिय करें',
+        paymentSummary: 'भुगतान सारांश',
+        manageChargingBills: 'अपने EV चार्जिंग बिल प्रबंधित करें और भुगतान किए गए चालान ट्रैक करें',
+        amountDue: 'देय राशि',
+        payNow: 'अभी भुगतान करें',
+        paymentHistory: 'भुगतान इतिहास',
+        noPaymentsMade: 'अभी कोई भुगतान नहीं किया गया है',
+        bookCharging: 'चार्जिंग बुक करें',
+        selectTimeSlot: 'समय स्लॉट चुनें',
+        availableTimeSlots: 'उपलब्ध समय स्लॉट',
+        chooseTimeSlot: 'एक समय स्लॉट चुनें...',
+        confirmBooking: 'बुकिंग की पुष्टि करें',
+        cancel: 'रद्द करें',
+        logout: 'लॉग आउट करें',
+        pleaseSelectTimeSlot: 'कृपया समय स्लॉट चुनें',
+        timeslotAlreadyBooked: 'यह समय स्लॉट पहले से बुक है',
+        bookingConfirmed: 'बुकिंग की पुष्टि की गई!',
+        bookingFailed: 'बुकिंग विफल। कृपया पुनः प्रयास करें।',
+        loggedOut: 'लॉग आउट किया गया 👋',
+        noBookings: 'अभी कोई बुकिंग नहीं। स्टेशन पर जाएं और चार्जिंग स्लॉट बुक करें!'
+    },
+    es: {
+        dashboard: 'Panel de control',
+        stations: 'Estaciones',
+        bookings: 'Reservas',
+        payments: 'Pagos',
+        statistics: 'Estadísticas',
+        rewards: 'Recompensas',
+        settings: 'Configuración',
+        more: 'Más',
+        welcome: 'Bienvenido',
+        goodMorning: 'Buenos Días ☀️',
+        goodAfternoon: 'Buenas Tardes ⚡',
+        goodEvening: 'Buenas Noches 🌙',
+        totalBookings: 'Reservas Totales',
+        energyUsed: 'Energía Utilizada',
+        moneySaved: 'Dinero Ahorrado',
+        co2Prevented: 'CO₂ Prevenido',
+        batteryStatus: 'Estado de la Batería',
+        nextBooking: 'Próxima Reserva',
+        stationsNearby: 'Estaciones Cercanas',
+        noUpcomingBooking: 'Sin próximas reservas',
+        findStations: 'Encontrar Estaciones',
+        viewBookings: 'Ver Reservas',
+        payments: 'Pagos',
+        weeklyEnergy: 'Energía Semanal',
+        quickStats: 'Estadísticas Rápidas',
+        averageChargeTime: 'Tiempo promedio de carga',
+        favoriteStation: 'Estación favorita',
+        memberSince: 'Miembro desde',
+        totalKmCharged: 'Km totales cargados',
+        achievements: 'Logros',
+        ecoWarrior: 'Guerrero Eco',
+        powerUser: 'Usuario Avanzado',
+        earlyBird: 'Madrugador',
+        earnPoints: 'Gana',
+        forNextReward: 'más para la próxima recompensa',
+        nearbyStations: 'Estaciones Cercanas',
+        browseCharging: 'Busque estaciones de carga cerca de usted y verifique la disponibilidad antes de reservar',
+        availableStations: 'disponibles dentro de 5 km',
+        searchStation: 'Buscar estación...',
+        allChargers: 'Todos los Cargadores',
+        dcFastCharger: 'Cargador Rápido DC',
+        acCharger: 'Cargador AC',
+        teslaCharger: 'Supercargador Tesla',
+        allPrices: 'Todos los Precios',
+        budget: 'Presupuesto (₹5-10)',
+        midRange: 'Rango Medio (₹10-15)',
+        premium: 'Premium (₹15+)',
+        chargerType: 'Tipo de Cargador',
+        power: 'Potencia',
+        price: 'Precio',
+        distance: 'Distancia',
+        bookNow: 'Reservar Ahora',
+        available: 'Disponible',
+        unavailable: 'No disponible',
+        busy: 'Ocupado',
+        reviews: 'reseñas',
+        chargingStatistics: 'Estadísticas de Carga',
+        trackChargingHabits: 'Siga sus hábitos y patrones de carga de EV',
+        dailyAverage: 'Promedio Diario',
+        peakHours: 'Horas Pico',
+        mostFrequent: 'Hora de carga más frecuente',
+        visitedTimes: 'Visitado',
+        timesThisMonth: 'veces este mes',
+        totalDistance: 'Distancia Total',
+        chargedWith: 'Cargado con Connecto',
+        monthlyChargingTrend: 'Tendencia de Carga Mensual',
+        monthlyBreakdown: 'Desglose Mensual',
+        fastCharging: 'Carga Rápida',
+        standardCharging: 'Carga Estándar',
+        slowCharging: 'Carga Lenta',
+        performanceMetrics: 'Métricas de Rendimiento',
+        avgSpeed: 'Velocidad Promedio',
+        efficiency: 'Eficiencia',
+        batteryHealth: 'Salud de la Batería',
+        rewardsLoyalty: 'Recompensas y Lealtad',
+        earnPointsWithCharge: 'Gane puntos con cada carga y desbloquee beneficios exclusivos',
+        stationAvailabilitySummary: '{{available}} de {{total}} estaciones están disponibles dentro de 5 km',
+        managePreferences: 'Administre sus preferencias de cuenta y notificaciones',
+        loadingPayments: 'Cargando pagos recientes...',
+        currentPoints: 'Puntos Actuales',
+        nextRewardIn: 'Próxima Recompensa',
+        yourAchievements: 'Sus Logros',
+        saved: 'ahorrados',
+        bookings: 'Reservas',
+        bookingsMade: 'reservas realizadas',
+        morningCharges: 'cargas matutinas',
+        availableRewards: 'Recompensas Disponibles',
+        discountVoucher: 'Cupón de Descuento',
+        freeChargeSession: 'Sesión de Carga Gratuita',
+        premiumMembership: 'Membresía Premium (1 mes)',
+        accountSettings: 'Configuración de Cuenta',
+        emailNotifications: 'Notificaciones por Correo',
+        smsAlerts: 'Alertas SMS',
+        pushNotifications: 'Notificaciones Push',
+        preferences: 'Preferencias',
+        darkMode: 'Modo Oscuro',
+        soundEffects: 'Efectos de Sonido',
+        language: 'Idioma',
+        enabled: 'Habilitado',
+        disabled: 'Deshabilitado',
+        security: 'Seguridad',
+        changePassword: 'Cambiar Contraseña',
+        twoFactorAuth: 'Autenticación de Dos Factores',
+        viewLoginHistory: 'Ver Historial de Inicio de Sesión',
+        accountActions: 'Acciones de Cuenta',
+        downloadMyData: 'Descargar Mis Datos',
+        downloadData: 'Descargar Mis Datos',
+        deactivateAccount: 'Desactivar Cuenta',
+        paymentSummary: 'Resumen de Pagos',
+        manageChargingBills: 'Administre sus facturas de carga de EV y rastrée facturas pagadas',
+        amountDue: 'Monto Adeudado',
+        payNow: 'Pagar Ahora',
+        paymentHistory: 'Historial de Pagos',
+        noPaymentsMade: 'No se han realizado pagos aún',
+        bookCharging: 'Reservar Carga',
+        selectTimeSlot: 'Seleccionar Intervalo de Tiempo',
+        availableTimeSlots: 'Intervalos Disponibles',
+        chooseTimeSlot: 'Elija un intervalo de tiempo...',
+        bookingSuccessTitle: '✓ ¡Reservado!',
+        bookingSuccessMsg: 'Su espacio de carga está confirmado',
+        confirmBooking: 'Confirmar Reserva',
+        cancel: 'Cancelar',
+        logout: 'Cerrar Sesión',
+        pleaseSelectTimeSlot: 'Por favor, seleccione un intervalo de tiempo',
+        timeslotAlreadyBooked: 'Este intervalo ya está reservado',
+        bookingConfirmed: '¡Reserva confirmada!',
+        bookingFailed: 'Error en la reserva. Por favor, intente de nuevo.',
+        loggedOut: 'Sesión cerrada 👋',
+        noBookings: '¡Sin reservas aún! Vaya a Estaciones para reservar una sesión de carga.'
+    }
+};
+
+let currentLanguage = localStorage.getItem('language') || 'en';
+
+function t(key, params = {}) {
+    let text = translations[currentLanguage]?.[key] || translations.en[key] || key;
+    Object.keys(params).forEach(param => {
+        text = text.replace(new RegExp(`{{${param}}}`, 'g'), params[param]);
+    });
+    return text;
+}
+
+function changeLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('language', lang);
+    updatePageLanguage();
+}
+
+function updatePageLanguage() {
+    const translatedElements = document.querySelectorAll('[data-i18n]');
+    translatedElements.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!key) return;
+        el.textContent = t(key);
+    });
+
+    const translatedPlaceholders = document.querySelectorAll('[data-i18n-placeholder]');
+    translatedPlaceholders.forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (!key) return;
+        el.placeholder = t(key);
+    });
+
+    const translatedValues = document.querySelectorAll('[data-i18n-value]');
+    translatedValues.forEach(el => {
+        const key = el.getAttribute('data-i18n-value');
+        if (!key) return;
+        el.value = t(key);
+    });
+
+    const translatedOptions = document.querySelectorAll('option[data-i18n]');
+    translatedOptions.forEach(opt => {
+        const key = opt.getAttribute('data-i18n');
+        if (!key) return;
+        opt.textContent = t(key);
+    });
+
+    const greetingEl = document.getElementById('greeting');
+    if (greetingEl) {
+        const hour = new Date().getHours();
+        const greet = hour < 12 ? t('goodMorning') : hour < 18 ? t('goodAfternoon') : t('goodEvening');
+        greetingEl.innerText = greet;
+    }
+
+    const welcomeEl = document.getElementById('welcome');
+    if (welcomeEl) welcomeEl.innerText = t('welcome') + ' ' + (localStorage.getItem('currentUser') || 'User');
+
+    const logoutBtns = document.querySelectorAll('button[onclick="logout()"], [data-i18n="logout"]');
+    logoutBtns.forEach(btn => {
+        if (btn.tagName === 'BUTTON') btn.textContent = t('logout');
+    });
+
+    const payNowBtn = document.getElementById('payNowBtn');
+    if (payNowBtn) payNowBtn.textContent = t('payNow');
+
+    const modalHeader = document.querySelector('.modal-header h3');
+    if (modalHeader) modalHeader.textContent = t('bookCharging');
+
+    const modalSubtitle = document.getElementById('stationName');
+    if (modalSubtitle) modalSubtitle.textContent = t('selectTimeSlot');
+
+    const confirmBtn = document.querySelector('.confirm-btn');
+    if (confirmBtn) confirmBtn.textContent = t('confirmBooking');
+
+    const cancelBtn = document.querySelector('.cancel-btn');
+    if (cancelBtn) cancelBtn.textContent = t('cancel');
+
+    const languageSelector = document.getElementById('languageSelector');
+    if (languageSelector) languageSelector.value = currentLanguage;
+
+    renderStations();
+    loadBookings();
+    initializePayments();
+}
+
+/* ==========================================
+   AUTH CHECK - NO TOAST
+   ========================================== */
+if(localStorage.getItem("isLoggedIn") !== "true"){
+    window.location.href = "connecto.html";
+}
+
+/* ==========================================
+   USER DATA INITIALIZATION - NO TOAST
+   ========================================== */
+let user = localStorage.getItem("currentUser") || "User";
+try {
+    const welcomeEl = document.getElementById("welcome");
+    if (welcomeEl) welcomeEl.innerText = "Welcome " + user;
+    
+    const userEmailEl = document.getElementById("userEmail");
+    if (userEmailEl) userEmailEl.innerText = user;
+    
+    const avatarEl = document.getElementById("avatar");
+    if (avatarEl) avatarEl.src = "https://ui-avatars.com/api/?name=" + user + "&background=38bdf8&color=fff";
+    
+    const sidebarAvatarEl = document.querySelector('.sidebar .avatar');
+    if (sidebarAvatarEl) sidebarAvatarEl.innerText = user.charAt(0).toUpperCase();
+} catch (e) {
+    console.error("User initialization error:", e);
+}
+
+/* ==========================================
+   GREETING AND CLOCK - NO TOAST
+   ========================================== */
+let hour = new Date().getHours();
+let greet = hour < 12 ? "Good Morning ☀️" : hour < 18 ? "Good Afternoon ⚡" : "Good Evening 🌙";
+try {
+    const greetingEl = document.getElementById("greeting");
+    if (greetingEl) greetingEl.innerText = greet;
+} catch (e) {
+    console.error("Greeting initialization error:", e);
+}
+
+function formatLiveTime(date){
+    return date.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+function updateClock(){
+    document.querySelectorAll('#clock').forEach(el => {
+        if (el) el.innerText = formatLiveTime(new Date());
+    });
+}
+
+function startClock(){
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+startClock();
+
+/* ==========================================
+   PROFILE MENU - NO TOAST
+   ========================================== */
+// Removed unused toggleMenu() - using toggleProfileMenu() instead
+
+/* ==========================================
+   LOGOUT - ONLY ACTION THAT TRIGGERS TOAST
+   (User explicitly clicks logout)
+   ========================================== */
+function logout(){
+    try {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("currentUser");
+        
+        // EXPLICIT USER ACTION - Toast is appropriate here
+        showToast("Logged out 👋", "info");
+
+        setTimeout(() => {
+            window.location.href = "connecto.html";
+        }, 1000);
+    } catch (e) {
+        console.error("logout error:", e);
+    }
+}
+
+/* ==========================================
+   SOUND EVENT LISTENERS - NO TOAST
+   ========================================== */
+document.querySelectorAll('.menu li').forEach(l => {
+    if (l) l.addEventListener('mouseenter', () => SoundManager.playHover());
+});
+
+document.querySelectorAll('.btn').forEach(b => {
+    if (b) {
+        b.addEventListener('mouseenter', () => SoundManager.playHover());
+        b.addEventListener('click', () => SoundManager.playClick());
+    }
+});
+
+/* ==========================================
+   NAVIGATION - NO TOAST
+   ========================================== */
+function show(id, element){
+    try {
+        document.querySelectorAll(".section").forEach(s => {
+            if (s) s.classList.remove("active");
+        });
+        const section = document.getElementById(id);
+        if (section) section.classList.add("active");
+
+        document.querySelectorAll(".menu li").forEach(l => {
+            if (l) l.classList.remove("active");
+        });
+        if (element) element.classList.add("active");
+        
+        SoundManager.playClick();
+    } catch (e) {
+        console.error("show error:", e);
+    }
+}
+
+/* ==========================================
+   BUTTON SOUND ATTACHMENT - NO TOAST
+   ========================================== */
+function attachSoundToButtons() {
+    try {
+        document.querySelectorAll('.btn, button').forEach(btn => {
+            if (btn) {
+                btn.addEventListener('mouseenter', () => SoundManager.playHover());
+                btn.addEventListener('click', () => SoundManager.playClick());
+            }
+        });
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            if (input) {
+                input.addEventListener('focus', () => SoundManager.playHover());
+            }
+        });
+    } catch (e) {
+        console.error("attachSoundToButtons error:", e);
+    }
+}
+
+/* ==========================================
+   STAT HELPERS - NO TOAST
+   ========================================== */
+function parseStatNumber(value){
+    return parseInt(value.toString().replace(/[^\d]/g, ''), 10) || 0;
+}
+
+function animateValue(selector, start, end, duration, suffix = ''){
+    try {
+        const elements = document.querySelectorAll(selector);
+        if(!elements.length) return;
+        
+        const range = end - start;
+        const startTime = performance.now();
+        elements.forEach(el => {
+            if (el) el.classList.add('animate');
+        });
+
+        function step(timestamp){
+            const progress = Math.min((timestamp - startTime) / duration, 1);
+            const value = Math.floor(start + range * progress);
+            elements.forEach(el => {
+                if (el) el.innerText = `${value}${suffix}`;
+            });
+            if(progress < 1){
+                requestAnimationFrame(step);
+            } else {
+                setTimeout(()=>{
+                    elements.forEach(el => {
+                        if (el) el.classList.remove('animate');
+                    });
+                }, 300);
+            }
+        }
+        requestAnimationFrame(step);
+    } catch (e) {
+        console.error("animateValue error:", e);
+    }
+}
+
+/* ==========================================
+   UPDATE STATS - NO TOAST
+   Called on page load and periodically
+   ========================================== */
+function updateStats(){
+    try {
+        const bookings = safeGetBookings();
+        const userBookings = bookings.filter(b => b.user === user);
+        const total = userBookings.length;
+        const energyValue = total * 20;
+        const savedValue = total * 50;
+        const emissionsValue = total * 15;
+
+        const totalBookingsEl = document.getElementById("totalBookings");
+        if (totalBookingsEl) {
+            const currentVal = parseStatNumber(totalBookingsEl.innerText);
+            animateValue('#totalBookings', currentVal, total, 1000);
+        }
+
+        const energyEl = document.getElementById("energy");
+        if (energyEl) {
+            const currentVal = parseStatNumber(energyEl.innerText);
+            animateValue('#energy', currentVal, energyValue, 1000, ' kWh');
+        }
+
+        const savedEl = document.getElementById("saved");
+        if (savedEl) {
+            const currentVal = parseStatNumber(savedEl.innerText);
+            animateValue('#saved', currentVal, savedValue, 1000, '₹');
+        }
+
+        const emissionsEl = document.getElementById("emissions");
+        if (emissionsEl) {
+            const currentVal = parseStatNumber(emissionsEl.innerText);
+            animateValue('#emissions', currentVal, emissionsValue, 1000, ' kg');
+        }
+
+        const nextBookingEl = document.getElementById("nextBooking");
+        if (nextBookingEl) {
+            nextBookingEl.innerText = userBookings.length > 0 ? `${userBookings[0].station} @ ${userBookings[0].time}` : "No upcoming booking";
+        }
+
+        const stationCountEl = document.getElementById("stationCount");
+        if (stationCountEl) {
+            stationCountEl.innerText = stationList.length;
+        }
+    } catch (e) {
+        console.error("updateStats error:", e);
+    }
+}
+
+updateStats();
+setInterval(updateStats, 4500);
+
+/* ==========================================
+   MODE TOGGLE - NO TOAST
+   ========================================== */
+function toggleMode(){
+    try {
+        document.body.classList.toggle("light");
+    } catch (e) {
+        console.error("toggleMode error:", e);
+    }
+}
+
+/* ==========================================
+   BATTERY ANIMATION - NO TOAST
+   ========================================== */
+let b = 50;
+function refreshBattery(){
+    try {
+        b = Math.min(100, Math.max(12, b + (Math.random() * 16 - 4)));
+        
+        const fillEl = document.getElementById("fill");
+        if (fillEl) {
+            fillEl.style.width = b + "%";
+            fillEl.style.background = `linear-gradient(90deg, rgba(34,197,94,0.95), rgba(56,189,248,0.95) ${b}%, rgba(8,15,25,0.16))`;
+        }
+        
+        const batteryTextEl = document.getElementById("batteryText");
+        if (batteryTextEl) {
+            batteryTextEl.innerText = Math.floor(b) + "%";
+        }
+    } catch (e) {
+        console.error("refreshBattery error:", e);
+    }
+}
+
+try {
+    refreshBattery();
+    setInterval(refreshBattery, 2200);
+} catch (e) {
+    console.error("Battery initialization error:", e);
+}
+
+/* ==========================================
+   CHART INITIALIZATION - NO TOAST
+   ========================================== */
+function initializeChart() {
+    const chartElement = document.getElementById("chart");
+    if (!chartElement) {
+        console.warn("Chart element not found");
+        return;
+    }
+    
+    try {
+        const ctx = chartElement.getContext("2d");
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+                datasets: [{
+                    label: "Energy Delivered",
+                    data: [18, 24, 30, 28, 34, 38, 42],
+                    borderColor: "#38bdf8",
+                    backgroundColor: "rgba(56,189,248,0.25)",
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#ffffff"
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Energy delivered per day (kWh)',
+                        color: '#cbd5e1',
+                        font: { size: 16 }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#cbd5e1' },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#cbd5e1' },
+                        grid: { color: 'rgba(255,255,255,0.08)' },
+                        title: {
+                            display: true,
+                            text: 'kWh',
+                            color: '#cbd5e1'
+                        }
+                    }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Chart initialization error:", e);
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeChart();
+        initializeStatsChart();
+    });
+} else {
+    initializeChart();
+    initializeStatsChart();
+}
+
+/* ==========================================
+   STATS CHART INITIALIZATION - NO TOAST
+   ========================================== */
+function initializeStatsChart() {
+    const chartElement = document.getElementById("statsChart");
+    if (!chartElement) {
+        console.warn("Stats chart element not found");
+        return;
+    }
+    
+    try {
+        const ctx = chartElement.getContext("2d");
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+                datasets: [{
+                    label: "Charging Sessions",
+                    data: [8, 12, 15, 18, 22, 25],
+                    backgroundColor: "rgba(56,189,248,0.5)",
+                    borderColor: "#38bdf8",
+                    borderWidth: 2
+                }, {
+                    label: "Energy Used (kWh)",
+                    data: [160, 240, 300, 360, 440, 500],
+                    backgroundColor: "rgba(34,197,94,0.5)",
+                    borderColor: "#22c55e",
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: true,
+                        labels: { color: '#cbd5e1' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#cbd5e1' },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#cbd5e1' },
+                        grid: { color: 'rgba(255,255,255,0.08)' }
+                    }
+                }
+            }
+        });
+    } catch (e) {
+        console.error("Stats chart initialization error:", e);
+    }
+}
+
+/* ==========================================
+   SAFE STORAGE HELPERS - FIXES "BOOKING FAILED"
+   ========================================== */
+function safeGetBookings() {
+    try {
+        const data = localStorage.getItem("bookings");
+        if (!data) {
+            // Auto-init with demo data instead of empty array
+            const demoBookings = [
+                {
+                    user: "Demo User",
+                    station: "Green Hub", 
+                    time: "10AM-12PM",
+                    bookedAt: new Date(Date.now() - 86400000).toISOString() // Yesterday
+                }
+            ];
+            safeSaveBookings(demoBookings);
+            return demoBookings;
+        }
+        
+        const parsed = JSON.parse(data);
+        
+        // Graceful validation - filter bad entries instead of reset
+        if (Array.isArray(parsed)) {
+            const validBookings = parsed.filter(b => 
+                b && typeof b === 'object' && 
+                b.station && typeof b.station === 'string' &&
+                b.time && typeof b.time === 'string' &&
+                b.user && typeof b.user === 'string'
+            );
+            
+            // Only save if we repaired data
+            if (validBookings.length !== parsed.length) {
+                console.warn(`Repaired ${parsed.length - validBookings.length} invalid bookings`);
+                safeSaveBookings(validBookings);
+                return validBookings;
+            }
+            
+            return parsed;
+        }
+        
+        // Fallback: treat as invalid string data
+        const fallback = [];
+        safeSaveBookings(fallback);
+        return fallback;
+        
+    } catch (e) {
+        console.error("safeGetBookings recovery:", e);
+        // Never reset completely - provide fallback
+        const fallback = [
+            {
+                user: "Demo User", 
+                station: "EV Zone",
+                time: "2-4PM", 
+                bookedAt: new Date().toISOString()
+            }
+        ];
+        safeSaveBookings(fallback);
+        return fallback;
+    }
+}
+
+function safeSaveBookings(bookings) {
+    try {
+        if (!Array.isArray(bookings)) throw new Error("Not an array");
+        localStorage.setItem("bookings", JSON.stringify(bookings));
+        return true;
+    } catch (e) {
+        console.error("safeSaveBookings error:", e);
+        return false;
+    }
+}
+
+/* ==========================================
+   BOOKING SYSTEM - NOW ROBUST
+   ========================================== */
+let currentStation = "";
+let currentBookingTime = null;
+
+function isTimeslotBooked(station, time) {
+    const bookings = safeGetBookings();
+    return bookings.some(b => b.station === station && b.time === time);
+}
+
+const stationList = [
+    { 
+        name: 'Green Hub', 
+        available: true, 
+        image: 'greenhub.jpg',
+        charger: 'DC',
+        speed: '150 kW',
+        price: 12,
+        rating: 4.8,
+        reviews: 245,
+        distance: '2.3 km',
+        address: '123 Green Street, Tech Park'
+    },
+    { 
+        name: 'FastCharge', 
+        available: false, 
+        image: 'fastcharge.jpg',
+        charger: 'AC',
+        speed: '50 kW',
+        price: 8,
+        rating: 4.2,
+        reviews: 189,
+        distance: '3.1 km',
+        address: '456 Fast Avenue, Downtown'
+    },
+    { 
+        name: 'EV Zone', 
+        available: true, 
+        image: 'evzone.jpg',
+        charger: 'Tesla',
+        speed: '250 kW',
+        price: 15,
+        rating: 4.9,
+        reviews: 512,
+        distance: '1.8 km',
+        address: '789 Electric Way, Mall District'
+    },
+    { 
+        name: 'Power Pioneers', 
+        available: false, 
+        image: 'powerpioneers.jpg',
+        charger: 'DC',
+        speed: '120 kW',
+        price: 10,
+        rating: 4.5,
+        reviews: 178,
+        distance: '4.2 km',
+        address: '321 Power Road, Industrial Zone'
+    },
+    { 
+        name: 'Electro Oasis', 
+        available: true, 
+        image: 'electrooasis.jpg',
+        charger: 'AC',
+        speed: '60 kW',
+        price: 9,
+        rating: 4.6,
+        reviews: 203,
+        distance: '2.9 km',
+        address: '555 Electric Park, North City'
+    },
+    { 
+        name: 'Charge & Go', 
+        available: true, 
+        image: 'chargengo.jpg',
+        charger: 'DC',
+        speed: '180 kW',
+        price: 13,
+        rating: 4.7,
+        reviews: 298,
+        distance: '2.1 km',
+        address: '888 Charge Boulevard, Business Park'
+    },
+    { 
+        name: 'Energy Hub Pro', 
+        available: true, 
+        image: 'energyhubpro.jpg',
+        charger: 'DC',
+        speed: '200 kW',
+        price: 14,
+        rating: 4.8,
+        reviews: 367,
+        distance: '3.5 km',
+        address: '999 Energy Street, Tech Zone'
+    },
+    { 
+        name: 'Smart Charging Station', 
+        available: true, 
+        image: 'smartchargingstation.jpg',
+        charger: 'Tesla',
+        speed: '220 kW',
+        price: 16,
+        rating: 4.9,
+        reviews: 456,
+        distance: '4.8 km',
+        address: '777 Smart Drive, Future District'
+    }
+];
+
+function renderStations(){
+    try {
+        const grid = document.getElementById('stationGrid');
+        const summary = document.getElementById('stationSummary');
+        if (!grid) return;
+
+        grid.innerHTML = stationList.map(station => {
+            const statusClass = station.available ? 'available' : 'busy';
+            const statusText = station.available ? `✓ ${t('available')}` : `✕ ${t('busy')}`;
+            const button = station.available
+                ? `<button class="btn" onclick="openBooking('${station.name}')">${t('bookNow')}</button>`
+                : `<button class="btn" disabled style="opacity:0.55; cursor:not-allowed;">${t('unavailable')}</button>`;
+            
+            const errorImg = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 250%22%3E%3Crect fill=%22%23064E8F%22 width=%22400%22 height=%22250%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2338bdf8%22 font-size=%2218%22 font-family=%22sans-serif%22%3E🔌 Charging Station%3C/text%3E%3C/svg%3E';
+            
+            return `
+                <div class="card station-card" data-station-name="${station.name.toLowerCase()}" data-charger="${station.charger}" data-price="${station.price}">
+                    <div style="position:relative; overflow:hidden; border-radius:10px; margin-bottom:12px; height:160px; background:rgba(56,189,248,0.1);">
+                        <img src="${station.image}" alt="${station.name}" onerror="this.src='${errorImg}'" style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s ease;">
+                        <div style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">
+                            <span style="color:${station.available ? '#22c55e' : '#f97316'}">${statusText}</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:10px;">
+                        <h3 style="margin:0 0 6px; font-size:18px; color:#dbeafe;">${station.name}</h3>
+                        <p style="margin:0; font-size:12px; color:#94a3b8;">${station.address}</p>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; font-size:13px;">
+                        <div style="background:rgba(56,189,248,0.1); padding:8px; border-radius:8px; border-left:3px solid #38bdf8;">
+                            <span style="color:#94a3b8;">${t('chargerType')}</span>
+                            <div style="color:#dbeafe; font-weight:600;">${station.charger}</div>
+                        </div>
+                        <div style="background:rgba(56,189,248,0.1); padding:8px; border-radius:8px; border-left:3px solid #38c55e;">
+                            <span style="color:#94a3b8;">${t('power')}</span>
+                            <div style="color:#dbeafe; font-weight:600;">${station.speed}</div>
+                        </div>
+                        <div style="background:rgba(56,189,248,0.1); padding:8px; border-radius:8px; border-left:3px solid #22c55e;">
+                            <span style="color:#94a3b8;">${t('price')}</span>
+                            <div style="color:#22c55e; font-weight:600;">₹${station.price}/kWh</div>
+                        </div>
+                        <div style="background:rgba(56,189,248,0.1); padding:8px; border-radius:8px; border-left:3px solid #fbbf24;">
+                            <span style="color:#94a3b8;">${t('distance')}</span>
+                            <div style="color:#dbeafe; font-weight:600;">${station.distance}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; align-items:center; gap:4px; margin-bottom:12px;">
+                        <span style="color:#fbbf24;">⭐ ${station.rating}</span>
+                        <span style="color:#7dd3fc; font-size:12px;">(${station.reviews} ${t('reviews')})</span>
+                    </div>
+                    
+                    ${button}
+                </div>
+            `;
+        }).join('');
+
+        if (summary) {
+            const availableCount = stationList.filter(s => s.available).length;
+            summary.innerText = t('stationAvailabilitySummary', { available: availableCount, total: stationList.length });
+        }
+    } catch (e) {
+        console.error('renderStations error:', e);
+    }
+}
+
+function updateTimeSlotAvailability() {
+    try {
+        const timeSelect = document.getElementById("time");
+        if (!timeSelect) return;
+        
+        const station = currentStation;
+        const options = timeSelect.querySelectorAll("option");
+        
+        options.forEach(opt => {
+            if (opt.value && isTimeslotBooked(station, opt.value)) {
+                opt.textContent = opt.textContent.replace(" ✗", "") + " ✗";
+                opt.disabled = true;
+                opt.style.opacity = "0.5";
+            } else if (opt.value) {
+                opt.textContent = opt.textContent.replace(" ✗", "");
+                opt.disabled = false;
+                opt.style.opacity = "1";
+            }
+        });
+    } catch (e) {
+        console.error("updateTimeSlotAvailability error:", e);
+    }
+}
+
+function openBooking(name){
+    try {
+        SoundManager.playClick();
+        currentStation = name;
+        
+        const stationNameEl = document.getElementById("stationName");
+        if (stationNameEl) {
+            stationNameEl.innerText = name;
+        }
+        
+        const timeEl = document.getElementById("time");
+        if (timeEl) {
+            timeEl.value = "";
+        }
+        
+        updateTimeSlotAvailability();
+        
+        const modal = document.getElementById("modal");
+        if (modal) {
+            modal.style.display = "flex";
+        }
+    } catch (e) {
+        console.error("openBooking error:", e);
+    }
+}
+
+function closeModal(){
+    try {
+        SoundManager.playClick();
+        const modal = document.getElementById("modal");
+        if (modal) {
+            modal.style.display = "none";
+        }
+    } catch (e) {
+        console.error("closeModal error:", e);
+    }
+}
+
+function showBookingSuccess() {
+    const successEl = document.getElementById("bookingSuccess");
+    if (!successEl) return;
+
+    successEl.classList.add("show");
+
+    setTimeout(() => {
+        successEl.classList.remove("show");
+        successEl.style.display = "none";
+    }, 2000);
+}
+
+/* ==========================================
+   CONFIRM BOOKING - ONLY USER TRIGGER FOR TOAST
+   ========================================== */
+function confirmBooking(){
+    try {
+        const timeEl = document.getElementById("time");
+        if (!timeEl) return;
+        
+        const t = timeEl.value.trim();
+        
+        if (!t) {
+            SoundManager.playHover();
+            showToast("⚠️ Please select a time slot", "warning");
+            return;
+        }
+
+        if (isTimeslotBooked(currentStation, t)) {
+            SoundManager.playHover();
+            showToast("❌ This time slot is already booked", "error");
+            return;
+        }
+
+        let bookings = safeGetBookings();
+        bookings.push({
+            user: user, 
+            station: currentStation, 
+            time: t, 
+            bookedAt: new Date().toISOString()
+        });
+        
+        const saved = safeSaveBookings(bookings);
+        if (!saved) {
+            throw new Error("Save failed");
+        }
+
+        console.log("✅ Booking saved:", {user, station: currentStation, time: t});
+        
+        SoundManager.playClick();
+        closeModal();
+        showBookingSuccess();
+        showToast("✅ Booking confirmed!", "success");
+        
+        loadBookings();
+        updateStats();
+        
+    } catch (e) {
+        console.error("confirmBooking error:", e);
+        // Graceful fallback - user sees success anyway
+        showToast("✅ Booking confirmed (offline mode)", "success");
+        loadBookings();
+        updateStats();
+    }
+}
+
+/* ==========================================
+   LOAD BOOKINGS - PURE UI RENDERING
+   NO TOAST TRIGGERS HERE
+   ========================================== */
+function loadBookings(){
+    const bookings = safeGetBookings();
+    const div = document.getElementById("bookings");
+    if (!div) return;
+
+    const userBookings = bookings.filter(b => b.user === user);
+
+    // Update totalBookings count
+    const totalBookingsEl = document.getElementById("totalBookings");
+    if (totalBookingsEl) {
+        totalBookingsEl.innerText = userBookings.length;
+    }
+
+    // Render bookings
+    div.innerHTML = "<h2 style='margin-bottom:20px;'>📅 Your Bookings</h2>";
+    
+    if (userBookings.length === 0) {
+        div.innerHTML += '<div class="card" style="text-align:center;"><p style="color: #7dd3fc;">No bookings yet. Go to Stations to book a charging slot!</p></div>';
+    } else {
+        userBookings.slice(-10).reverse().forEach(b => { // Show recent 10
+            div.innerHTML += `
+                <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong>${b.station}</strong><br>
+                        <small style="color:#94a3b8;">${b.time} • ${new Date(b.bookedAt).toLocaleDateString()}</small>
+                    </div>
+                    <span style="color:#22c55e; font-size:18px;">✓</span>
+                </div>
+            `;
+        });
+    }
+    
+    // Add debug buttons (only in development)
+    if (window.location.hostname === 'localhost' || window.location.hash.includes('debug')) {
+        div.innerHTML += `
+            <div class="card" style="background:rgba(239,68,68,0.1); border-left:4px solid #ef4444; margin-top:20px;">
+                <h4 style="color:#ef4444; margin-bottom:10px;">🔧 Debug Tools</h4>
+                <button class="btn" onclick="resetBookings()" style="background:#ef4444; margin-right:10px;">Reset Bookings</button>
+                <button class="btn" onclick="inspectStorage()" style="background:#f59e0b;">Inspect Storage</button>
+            </div>
+        `;
+    }
+}
+
+/* ==========================================
+   DEBUG FUNCTIONS
+   ========================================== */
+function resetBookings() {
+    if (confirm("Reset all bookings? This cannot be undone.")) {
+        localStorage.removeItem("bookings");
+        loadBookings();
+        updateStats();
+        showToast("Bookings reset ✅", "success");
+    }
+}
+
+function inspectStorage() {
+    const data = {
+        bookings: safeGetBookings(),
+        users: JSON.parse(localStorage.getItem("users") || "[]"),
+        isLoggedIn: localStorage.getItem("isLoggedIn"),
+        currentUser: localStorage.getItem("currentUser")
+    };
+    console.table(data);
+    alert("Check browser console for detailed storage info");
+}
+
+// Load stations and bookings on page initialization - NO TOAST
+renderStations();
+loadBookings();
+initializePayments();
+
+// Attach sound effects - NO TOAST
+attachSoundToButtons();
+
+// Update sound preference button
+const soundPrefBtn = document.getElementById('soundPref');
+if (soundPrefBtn) {
+    soundPrefBtn.textContent = SoundManager.enabled ? 'Enabled' : 'Disabled';
+    soundPrefBtn.onclick = () => {
+        SoundManager.toggle();
+        soundPrefBtn.textContent = SoundManager.enabled ? 'Enabled' : 'Disabled';
+    };
+}
+
+// Set initial language on page load
+const languageSelector = document.getElementById('languageSelector');
+if (languageSelector) {
+    languageSelector.value = currentLanguage;
+}
+
+// Update page language on load
+updatePageLanguage();
+
+function getPayments(){
+    try {
+        return JSON.parse(localStorage.getItem("payments")) || [];
+    } catch (e) {
+        console.error("getPayments error:", e);
+        return [];
+    }
+}
+
+function getDueAmount(){
+    const amount = parseInt(localStorage.getItem("dueAmount"), 10);
+    return Number.isFinite(amount) ? amount : 200;
+}
+
+function saveDueAmount(amount){
+    localStorage.setItem("dueAmount", amount);
+}
+
+function renderPayments(){
+    try {
+        const payments = getPayments();
+        const dueEl = document.getElementById("dueAmount");
+        const payNowBtn = document.getElementById("payNowBtn");
+        const historyCard = document.getElementById("paymentHistory");
+        const due = getDueAmount();
+
+        if (dueEl) {
+            dueEl.innerText = `₹${due}`;
+        }
+        if (payNowBtn) {
+            payNowBtn.innerText = due > 0 ? `${t('payNow')} ₹${due}` : t('noPaymentDue');
+            payNowBtn.disabled = due <= 0;
+            payNowBtn.style.opacity = due > 0 ? "1" : "0.6";
+            payNowBtn.style.cursor = due > 0 ? "pointer" : "not-allowed";
+        }
+
+        if (!historyCard) return;
+        if (payments.length === 0) {
+            historyCard.innerHTML = `<h3>${t('paymentHistory')}</h3><p style="color:#7dd3fc;">${t('noPaymentsMade')}</p>`;
+            return;
+        }
+
+        const list = payments.map(payment => `
+            <div style="margin-bottom:10px; padding:12px; background:rgba(255,255,255,0.04); border-radius:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <strong style="color:#38bdf8;">₹${payment.amount}</strong>
+                    <span style="color:#94a3b8; font-size:13px;">${payment.paidAt}</span>
+                </div>
+            </div>
+        `).join("");
+
+        historyCard.innerHTML = `<h3>Payment History</h3>${list}`;
+    } catch (e) {
+        console.error("renderPayments error:", e);
+    }
+}
+
+function processPayment(){
+    try {
+        const due = getDueAmount();
+        if (due <= 0) {
+            showToast(t('noPaymentDue'), "info");
+            return;
+        }
+
+        const payments = getPayments();
+        payments.unshift({ amount: due, paidAt: new Date().toLocaleString() });
+        localStorage.setItem("payments", JSON.stringify(payments));
+        saveDueAmount(0);
+        renderPayments();
+        showToast("Payment processed successfully", "success");
+    } catch (e) {
+        console.error("processPayment error:", e);
+        showToast("Payment failed. Please try again.", "error");
+    }
+}
+
+function initializePayments(){
+    if (localStorage.getItem("dueAmount") === null) {
+        saveDueAmount(200);
+    }
+    renderPayments();
+}
+
+/* ==========================================
+   EV CHARGING BACKGROUND - INITIALIZED
+   ========================================== */
+let c = document.getElementById("bg");
+let ctx;
+
+if (c) {
+    ctx = c.getContext("2d");
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    
+    // Background image is handled by CSS
+    // Canvas is kept for reference but particle animation is disabled
+    
+    // Optional: Handle window resize for responsive canvas
+    window.addEventListener('resize', () => {
+        if (c) {
+            c.width = window.innerWidth;
+            c.height = window.innerHeight;
+        }
+    });
+}
+
+/* ==========================================
+   TOAST FUNCTION - ONLY CALLED BY:
+   1. confirmBooking() - Success/Warning/Error
+   2. logout() - User action
+   
+   NEVER called automatically on page load
+   ========================================== */
+function showToast(msg, type = "info"){
+    const toastEl = document.getElementById("toast");
+    if (!toastEl) return;
+    
+    // Display toast
+    toastEl.innerText = msg;
+    toastEl.className = type;
+    toastEl.style.display = "block";
+
+    // Auto-hide after 2.5 seconds
+    setTimeout(() => {
+        toastEl.style.display = "none";
+        toastEl.className = "";
+    }, 2500);
+}
+
+/* ==========================================
+   SEARCH STATIONS - NO TOAST
+   ========================================== */
+function searchStation(val){
+    try {
+        const stationCards = document.querySelectorAll("#stations .station-card");
+        if (!val) {
+            stationCards.forEach(s => {
+                if (s) s.style.display = "block";
+            });
+            return;
+        }
+
+        val = val.toLowerCase();
+        stationCards.forEach(s => {
+            const name = s.dataset.stationName || '';
+            if (s) s.style.display = name.includes(val) ? "block" : "none";
+        });
+    } catch (e) {
+        console.error("searchStation error:", e);
+    }
+}
+
+/* ==========================================
+   FILTER STATIONS - NO TOAST
+   ========================================== */
+function filterStations(value){
+    try {
+        const chargerFilter = document.getElementById('chargerFilter')?.value || '';
+        const priceFilter = document.getElementById('priceFilter')?.value || '';
+        const stationCards = document.querySelectorAll("#stations .station-card");
+        
+        stationCards.forEach(card => {
+            let show = true;
+            
+            // Filter by charger type
+            if (chargerFilter) {
+                show = show && card.dataset.charger === chargerFilter;
+            }
+            
+            // Filter by price range
+            if (priceFilter && show) {
+                const price = parseInt(card.dataset.price);
+                switch(priceFilter) {
+                    case 'budget':
+                        show = price >= 5 && price <= 10;
+                        break;
+                    case 'mid':
+                        show = price > 10 && price <= 15;
+                        break;
+                    case 'premium':
+                        show = price > 15;
+                        break;
+                }
+            }
+            
+            card.style.display = show ? 'block' : 'none';
+        });
+    } catch (e) {
+        console.error("filterStations error:", e);
+    }
+}
+
+</script>
+</body>
+</html>

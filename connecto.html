@@ -1,0 +1,2026 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecto - The Ultimate EV Charging Platform</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ===== RESET & BASE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background: linear-gradient(135deg, #0a0f1a 0%, #0f1925 50%, #0d1420 100%);
+    color: #dbeafe;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(56,189,248,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(34,197,94,0.08) 0%, transparent 50%);
+    z-index: -2;
+    pointer-events: none;
+}
+
+/* ===== CANVAS BACKGROUND ===== */
+#bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    pointer-events: none;
+    background: linear-gradient(135deg, #0a0f1a 0%, #0f1925 50%, #0d1420 100%);
+}
+
+/* ===== BACKGROUND IMAGE ===== */
+.bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url('evphotos.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 1;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 60px;
+    background: rgba(10,15,26,0.4);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(56,189,248,0.1);
+    z-index: 90;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.navbar.scrolled {
+    background: rgba(10,15,26,0.7);
+    backdrop-filter: blur(15px);
+    padding: 15px 60px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #38bdf8 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: rgba(219,234,254,0.7);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #38bdf8, #22c55e);
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-links a:hover {
+    color: #38bdf8;
+}
+
+.nav-cta {
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 24px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(56,189,248,0.3);
+    position: relative;
+    overflow: visible;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.nav-cta::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    border-radius: 24px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    filter: blur(10px);
+}
+
+.nav-cta:hover::before {
+    opacity: 0.6;
+}
+
+.nav-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 36px rgba(56,189,248,0.4), 0 0 25px rgba(34,197,94,0.25);
+}
+
+/* ===== HERO SECTION ===== */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding-top: 80px;
+    background: transparent;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('https://images.unsplash.com/photo-1560958089-b8a46dd52956?w=1200&h=600&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: 0;
+    opacity: 0.08;
+    animation: heroZoom 20s ease-in-out infinite;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(10,15,26,0.7), rgba(10,15,26,0.85), rgba(56,189,248,0.1));
+    z-index: 1;
+}
+
+@keyframes heroZoom {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+}
+
+.hero h1 {
+    font-size: 72px;
+    font-weight: 900;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #38bdf8 0%, #22c55e 50%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero p {
+    font-size: 20px;
+    color: rgba(219,234,254,0.8);
+    margin-bottom: 40px;
+    animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.battery-container {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0;
+    animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.battery {
+    width: 120px;
+    height: 45px;
+    border: 3px solid #38bdf8;
+    border-radius: 8px;
+    position: relative;
+    background: rgba(56,189,248,0.05);
+    overflow: hidden;
+}
+
+.battery::after {
+    content: "";
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 18px;
+    background: #38bdf8;
+    border-radius: 2px;
+}
+
+.battery-level {
+    height: 100%;
+    width: 20%;
+    background: linear-gradient(90deg, #38bdf8, #22c55e);
+    animation: charge 3s ease-in-out infinite;
+    border-radius: 5px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 16px 40px;
+    border-radius: 28px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    box-shadow: 0 12px 36px rgba(56,189,248,0.3);
+    overflow: visible;
+}
+
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    border-radius: 28px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    filter: blur(12px);
+}
+
+.btn-primary:hover::before {
+    opacity: 0.5;
+}
+
+.btn-primary::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::after {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 52px rgba(56,189,248,0.45), 0 0 30px rgba(34,197,94,0.3);
+}
+
+.btn-secondary {
+    background: rgba(56,189,248,0.15);
+    color: #38bdf8;
+    border: 2px solid rgba(56,189,248,0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(56,189,248,0.25);
+    border-color: rgba(56,189,248,0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(56,189,248,0.2);
+}
+
+/* ===== WHY CONNECTO SECTION ===== */
+.why-connecto {
+    padding: 120px 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+.section-heading h2 {
+    font-size: 56px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #38bdf8 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-heading p {
+    font-size: 18px;
+    color: rgba(219,234,254,0.6);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(34,197,94,0.08));
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.feature-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.feature-card::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(34,197,94,0.1));
+    border-radius: 20px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    filter: blur(10px);
+}
+
+.feature-card:hover::after {
+    opacity: 0.6;
+}
+
+.feature-card:hover::before {
+    opacity: 1;
+}
+
+.feature-card:hover {
+    transform: translateY(-16px) rotateX(5deg) perspective(1000px);
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 28px 80px rgba(56,189,248,0.25), inset 0 0 30px rgba(56,189,248,0.05);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.15) rotateY(15deg);
+}
+
+.feature-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #dbeafe;
+}
+
+.feature-card p {
+    color: rgba(219,234,254,0.6);
+    line-height: 1.6;
+}
+
+/* ===== STATS SECTION ===== */
+.stats {
+    padding: 120px 60px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(34,197,94,0.06));
+    position: relative;
+}
+
+.stats::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(56,189,248,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(34,197,94,0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 30px 20px;
+    border-radius: 16px;
+    background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.15);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(34,197,94,0.08));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.stat-item::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(180deg, rgba(56,189,248,0.2), transparent);
+    border-radius: 16px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    filter: blur(8px);
+}
+
+.stat-item:hover::after {
+    opacity: 0.5;
+}
+
+.stat-item:hover::before {
+    opacity: 1;
+}
+
+.stat-item:hover {
+    background: rgba(56,189,248,0.14);
+    border-color: rgba(56,189,248,0.4);
+    transform: translateY(-12px);
+    box-shadow: 0 20px 60px rgba(56,189,248,0.2);
+}
+
+.stat-number {
+    font-size: 48px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    animation: countUp 2s ease-out forwards;
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+    transform: scale(1.08);
+}
+
+.stat-label {
+    color: rgba(219,234,254,0.7);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ===== PLATFORMS SECTION ===== */
+.platforms {
+    padding: 120px 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.platforms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.platform-card {
+    background: linear-gradient(135deg, rgba(56,189,248,0.1), rgba(34,197,94,0.08));
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 24px;
+    padding: 30px 30px 40px;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.platform-image {
+    width: 100%;
+    height: 180px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(34,197,94,0.1));
+    overflow: hidden;
+    border: 1px solid rgba(56,189,248,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.platform-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.platform-card:hover .platform-image {
+    transform: scale(1.05);
+    border-color: rgba(56,189,248,0.4);
+    box-shadow: 0 12px 32px rgba(56,189,248,0.2);
+}
+
+.platform-card:hover {
+    transform: translateY(-16px) perspective(1000px) rotateX(10deg);
+    border-color: rgba(56,189,248,0.4);
+    box-shadow: 0 30px 80px rgba(56,189,248,0.25);
+}
+
+.platform-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.platform-card h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #dbeafe;
+}
+
+.platform-card p {
+    color: rgba(219,234,254,0.65);
+    line-height: 1.6;
+    font-size: 14px;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.platform-btn {
+    background: linear-gradient(135deg, rgba(56,189,248,0.3), rgba(34,197,94,0.2));
+    color: #38bdf8;
+    border: 2px solid rgba(56,189,248,0.4);
+    padding: 12px 28px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+}
+
+.platform-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    left: -100%;
+    transition: left 0.5s ease;
+}
+
+.platform-btn:hover::before {
+    left: 100%;
+}
+
+.platform-btn:hover {
+    background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(34,197,94,0.35));
+    border-color: #38bdf8;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(56,189,248,0.25);
+}
+
+/* ===== CTA SECTION ===== */
+.cta {
+    padding: 100px 60px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+.cta-box {
+    background: linear-gradient(135deg, rgba(56,189,248,0.15), rgba(34,197,94,0.1));
+    border: 2px solid rgba(56,189,248,0.3);
+    border-radius: 30px;
+    padding: 80px 40px;
+    backdrop-filter: blur(20px);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #dbeafe;
+}
+
+.cta p {
+    font-size: 18px;
+    color: rgba(219,234,254,0.7);
+    margin-bottom: 40px;
+}
+
+.cta-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.cta-input input {
+    flex: 1;
+    padding: 14px 20px;
+    border: 1px solid rgba(219,234,254,0.2);
+    border-radius: 20px;
+    background: rgba(11,17,28,0.6);
+    color: #dbeafe;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.cta-input input:focus {
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 0 20px rgba(56,189,248,0.1);
+}
+
+.cta-input input::placeholder {
+    color: rgba(219,234,254,0.4);
+}
+
+.cta-btn {
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    border: none;
+    border-radius: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 32px rgba(56,189,248,0.3);
+    position: relative;
+    overflow: visible;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+.cta-btn::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    border-radius: 20px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.4s ease;
+    filter: blur(15px);
+}
+
+.cta-btn:hover::before {
+    opacity: 0.6;
+}
+
+.cta-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.15);
+    transition: left 0.6s ease;
+}
+
+.cta-btn:hover::after {
+    left: 100%;
+}
+
+.cta-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(56,189,248,0.45), 0 0 40px rgba(34,197,94,0.25);
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    background: rgba(6,11,18,0.8);
+    border-top: 1px solid rgba(56,189,248,0.1);
+    padding: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-col h4 {
+    margin-bottom: 20px;
+    color: #dbeafe;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li {
+    margin-bottom: 12px;
+}
+
+.footer-col a {
+    color: rgba(219,234,254,0.6);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.footer-col a:hover {
+    color: #38bdf8;
+    transform: translateX(4px);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(56,189,248,0.1);
+    padding-top: 30px;
+    text-align: center;
+    color: rgba(219,234,254,0.5);
+    font-size: 14px;
+}
+
+/* ===== LOGIN PANEL ===== */
+.login-panel {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 360px;
+    height: 100%;
+    padding: 40px 30px;
+    z-index: 150;
+    background: linear-gradient(135deg, rgba(10,15,26,0.98), rgba(6,11,18,0.95)) ,
+                rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-right: none;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.4);
+    transition: right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow-y: auto;
+}
+
+.login-panel.active {
+    right: 0;
+}
+
+.login-panel h2 {
+    color: #dbeafe;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.login-panel > p {
+    color: rgba(219,234,254,0.6);
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.login-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.login-tab {
+    flex: 1;
+    padding: 10px;
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    color: rgba(219,234,254,0.6);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.login-tab.active {
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    border-color: transparent;
+}
+
+.login-tab:hover {
+    border-color: rgba(56,189,248,0.4);
+}
+
+.login-form {
+    display: none;
+}
+
+.login-form.active {
+    display: block;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 12px;
+    background: rgba(11,17,28,0.8);
+    color: #dbeafe;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.login-form input:focus {
+    border-color: rgba(56,189,248,0.5);
+    box-shadow: 0 0 16px rgba(56,189,248,0.1);
+    background: rgba(11,17,28,0.95);
+}
+
+.login-form input::placeholder {
+    color: rgba(219,234,254,0.4);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    color: rgba(219,234,254,0.6);
+    cursor: pointer;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    box-shadow: 0 8px 20px rgba(56,189,248,0.2);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(56,189,248,0.3);
+}
+
+.forgot-pwd {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.forgot-pwd a {
+    color: #38bdf8;
+    text-decoration: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.forgot-pwd a:hover {
+    color: #22c55e;
+}
+
+.signup-link {
+    text-align: center;
+    color: rgba(219,234,254,0.6);
+    font-size: 13px;
+}
+
+.signup-link a {
+    color: #38bdf8;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.login-info {
+    background: rgba(56,189,248,0.1);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 12px;
+    color: rgba(219,234,254,0.7);
+    margin-top: 20px;
+    line-height: 1.5;
+}
+
+/* ===== SOUND TOGGLE ===== */
+.sound-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(34,197,94,0.15));
+    border: 2px solid rgba(56,189,248,0.3);
+    color: #38bdf8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    transition: all 0.3s ease;
+    z-index: 80;
+    box-shadow: 0 8px 24px rgba(56,189,248,0.15);
+}
+
+.sound-toggle:hover {
+    background: linear-gradient(135deg, rgba(56,189,248,0.35), rgba(34,197,94,0.25));
+    border-color: rgba(56,189,248,0.5);
+    transform: scale(1.1);
+    box-shadow: 0 12px 32px rgba(56,189,248,0.25);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes charge {
+    0%, 100% { width: 10%; }
+    50% { width: 90%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-30px); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes countUp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scroll-in {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scroll-in {
+    animation: scroll-in 0.6s ease-out forwards;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 15px 20px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .hero {
+        padding-top: 60px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 16px;
+    }
+
+    .why-connecto,
+    .platforms,
+    .cta,
+    .footer {
+        padding: 60px 20px;
+    }
+
+    .section-heading h2 {
+        font-size: 36px;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .feature-card {
+        padding: 30px 20px;
+    }
+
+    .platforms-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-box {
+        padding: 50px 20px;
+    }
+
+    .cta h2 {
+        font-size: 32px;
+    }
+
+    .login-panel {
+        width: 100%;
+        right: -100%;
+        border-radius: 0;
+    }
+}
+
+/* ===== FEATURE PREVIEW MODAL ===== */
+.feature-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.feature-modal.active {
+    display: flex;
+}
+
+.feature-modal-content {
+    background: linear-gradient(135deg, rgba(15,25,50,0.98), rgba(10,15,28,0.95));
+    border: 2px solid rgba(56,189,248,0.25);
+    border-radius: 28px;
+    padding: 50px;
+    max-width: 520px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    backdrop-filter: blur(30px);
+    box-shadow: 0 40px 120px rgba(0,0,0,0.6), inset 0 0 30px rgba(56,189,248,0.1);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.feature-modal-content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(56,189,248,0.5), transparent);
+}
+
+.feature-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(56,189,248,0.15);
+    border: 1px solid rgba(56,189,248,0.3);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: #38bdf8;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.feature-modal-close:hover {
+    background: rgba(56,189,248,0.3);
+    border-color: rgba(56,189,248,0.5);
+    transform: scale(1.1) rotate(90deg);
+}
+
+.feature-preview-image {
+    width: 100%;
+    height: 240px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, rgba(56,189,248,0.12), rgba(34,197,94,0.08));
+    overflow: hidden;
+    border: 2px solid rgba(56,189,248,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.feature-preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.feature-modal-content.active .feature-preview-image img {
+    animation: zoomIn 0.6s ease-out;
+}
+
+.feature-modal-title {
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #38bdf8 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.feature-modal-subtitle {
+    font-size: 16px;
+    color: rgba(219,234,254,0.6);
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.feature-modal-description {
+    font-size: 14px;
+    color: rgba(219,234,254,0.7);
+    line-height: 1.8;
+    margin-bottom: 30px;
+    background: rgba(56,189,248,0.08);
+    padding: 20px;
+    border-radius: 16px;
+    border-left: 3px solid rgba(56,189,248,0.4);
+}
+
+.feature-modal-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.modal-action-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+}
+
+.modal-action-btn.login {
+    background: linear-gradient(135deg, #38bdf8, #22c55e);
+    color: #020617;
+    box-shadow: 0 12px 32px rgba(56,189,248,0.3);
+}
+
+.modal-action-btn.login::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.1);
+    left: -100%;
+    transition: left 0.5s ease;
+}
+
+.modal-action-btn.login:hover::before {
+    left: 100%;
+}
+
+.modal-action-btn.login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(56,189,248,0.4);
+}
+
+.modal-action-btn.explore {
+    background: rgba(56,189,248,0.15);
+    color: #38bdf8;
+    border: 2px solid rgba(56,189,248,0.3);
+}
+
+.modal-action-btn.explore:hover {
+    background: rgba(56,189,248,0.25);
+    border-color: rgba(56,189,248,0.6);
+    transform: translateY(-2px);
+}
+
+.feature-modal-info {
+    font-size: 12px;
+    color: rgba(219,234,254,0.5);
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(56,189,248,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+<canvas id="bg"></canvas>
+<div class="bg-image"></div>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+    <div class="logo">Connecto ⚡</div>
+    <ul class="nav-links">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#why">Why Connecto</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#stats">Stats</a></li>
+        <li><a href="#platforms">Platforms</a></li>
+    </ul>
+    <button class="nav-cta" onclick="openLogin()">Login</button>
+</nav>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="hero" id="hero">
+    <div class="hero-content">
+        <h1>Charge Smart, Drive Far</h1>
+        <p>The ultimate EV charging platform with instant booking and real-time tracking</p>
+        
+        <div class="battery-container">
+            <div class="battery">
+                <div class="battery-level"></div>
+            </div>
+        </div>
+
+        <div class="hero-buttons">
+            <button class="btn-primary" onclick="openLogin(); SoundManager.playClick();">Get Started</button>
+            <button class="btn-secondary" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'}); SoundManager.playHover();">Learn More</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WHY CONNECTO ===== -->
+<section class="why-connecto" id="why">
+    <div class="section-heading">
+        <h2>Why Choose Connecto?</h2>
+        <p>Experience the future of EV charging with our intelligent platform</p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card scroll-in">
+            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+            <h3>Lightning Fast</h3>
+            <p>Book charging stations in seconds with our ultra-responsive platform</p>
+        </div>
+        <div class="feature-card scroll-in">
+            <div class="feature-icon"><i class="fas fa-map-location-dot"></i></div>
+            <h3>Real-time Tracking</h3>
+            <p>Find available stations near you with live location mapping</p>
+        </div>
+        <div class="feature-card scroll-in">
+            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+            <h3>Secure & Safe</h3>
+            <p>Enterprise-grade security for all your charging transactions</p>
+        </div>
+        <div class="feature-card scroll-in">
+            <div class="feature-icon"><i class="fas fa-headset"></i></div>
+            <h3>24/7 Support</h3>
+            <p>Round-the-clock customer support for seamless experience</p>
+        </div>
+    </div>
+</section>
+
+<!-- ===== STATS SECTION ===== -->
+<section class="stats" id="stats">
+    <div class="stats-grid">
+        <div class="stat-item scroll-in">
+            <div class="stat-number">14K+</div>
+            <div class="stat-label">Active Charging Stations</div>
+        </div>
+        <div class="stat-item scroll-in">
+            <div class="stat-number">500K+</div>
+            <div class="stat-label">Happy Users Worldwide</div>
+        </div>
+        <div class="stat-item scroll-in">
+            <div class="stat-number">99.8%</div>
+            <div class="stat-label">Platform Uptime</div>
+        </div>
+        <div class="stat-item scroll-in">
+            <div class="stat-number">4.9★</div>
+            <div class="stat-label">Average Rating</div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PLATFORMS SECTION ===== -->
+<section class="platforms" id="platforms">
+    <div class="section-heading">
+        <h2>Live Services</h2>
+        <p>Explore our comprehensive charging solutions</p>
+    </div>
+
+    <div class="platforms-grid">
+        <!-- LIVE TRACKING CARD -->
+        <div class="platform-card scroll-in">
+            <div class="platform-image">
+                <img src="https://images.unsplash.com/photo-1569163139394-de4798aa62b2?w=600&h=300&fit=crop" alt="Live Tracking" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%22%23064E8F%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2338bdf8%22 font-size=%2224%22 font-family=%22sans-serif%22%3ELive Tracking MAP%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="platform-icon"><i class="fas fa-satellite"></i></div>
+            <h3>Live Tracking</h3>
+            <p>Real-time GPS tracking of available charging stations with live availability updates and smart navigation</p>
+            <button class="platform-btn" onclick="openFeatureModal('tracking'); SoundManager.playClick();">Preview</button>
+        </div>
+
+        <!-- INSTANT BOOKING CARD -->
+        <div class="platform-card scroll-in">
+            <div class="platform-image">
+                <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=300&fit=crop" alt="Instant Booking" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%22%230F4C3A%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2322c55e%22 font-size=%2224%22 font-family=%22sans-serif%22%3EInstant Booking%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="platform-icon"><i class="fas fa-calendar-check"></i></div>
+            <h3>Instant Booking</h3>
+            <p>Reserve your charging slot in seconds with our one-tap booking system and automatic time slot optimization</p>
+            <button class="platform-btn" onclick="openFeatureModal('booking'); SoundManager.playClick();">Preview</button>
+        </div>
+
+        <!-- SMART DASHBOARD CARD -->
+        <div class="platform-card scroll-in">
+            <div class="platform-image">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=300&fit=crop" alt="Smart Dashboard" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%22%23362B5F%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2306b6d4%22 font-size=%2224%22 font-family=%22sans-serif%22%3ESmart Dashboard%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="platform-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>Smart Dashboard</h3>
+            <p>Monitor your charging history, stats, and get personalized recommendations based on your usage patterns</p>
+            <button class="platform-btn" onclick="openFeatureModal('dashboard'); SoundManager.playClick();">Preview</button>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CTA SECTION ===== -->
+<section class="cta">
+    <div class="cta-box">
+        <h2>Ready to Charge?</h2>
+        <p>Join thousands of EV owners already using Connecto</p>
+        
+        <div class="cta-input">
+            <input type="email" placeholder="Enter your email" id="ctaEmail">
+            <button class="cta-btn" onclick="handleCTASignup(); SoundManager.playClick();">Subscribe</button>
+        </div>
+        <p style="font-size: 12px; color: rgba(219,234,254,0.5);">No spam, just updates on new stations and features</p>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-col">
+            <h4>Connecto</h4>
+            <p style="font-size: 14px; color: rgba(219,234,254,0.6); margin-bottom: 0;">The future of EV charging is here.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Product</h4>
+            <ul>
+                <li><a href="#">Features</a></li>
+                <li><a href="#">Pricing</a></li>
+                <li><a href="#">Security</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Company</h4>
+            <ul>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Careers</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <ul>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Terms</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Connecto. All rights reserved. | Charge Smart, Drive Far ⚡</p>
+    </div>
+</footer>
+
+<!-- ===== LOGIN PANEL ===== -->
+<div class="login-panel" id="loginBox">
+    <h2>Welcome</h2>
+    <p>Sign in to access your charging dashboard</p>
+
+    <div class="login-tabs">
+        <button class="login-tab active" onclick="switchTab('email')">Email</button>
+        <button class="login-tab" onclick="switchTab('phone')">Phone</button>
+    </div>
+
+    <!-- EMAIL LOGIN FORM -->
+    <div id="emailForm" class="login-form active">
+        <input type="email" id="username" placeholder="Email address">
+        <div style="position: relative;">
+            <input type="password" id="password" placeholder="Password">
+            <i class="fas fa-eye" onclick="togglePassword()" style="position: absolute; right: 12px; top: 14px; cursor: pointer; color: #38bdf8;"></i>
+        </div>
+        <div class="checkbox-group">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe">Remember me</label>
+        </div>
+        <button class="submit-btn" onclick="login(); SoundManager.playClick();">Sign In</button>
+        <div class="forgot-pwd">
+            <a onclick="forgotPassword()">Forgot password?</a>
+        </div>
+    </div>
+
+    <!-- PHONE LOGIN FORM -->
+    <div id="phoneForm" class="login-form">
+        <input type="tel" id="phoneLogin" placeholder="Phone number" maxlength="10">
+        <button class="submit-btn" onclick="sendOTP(); SoundManager.playClick();" style="margin-bottom: 20px;">Send OTP</button>
+        <input type="text" id="otpInput" placeholder="Enter OTP">
+        <button class="submit-btn" onclick="verifyOTP(); SoundManager.playClick();">Verify & Login</button>
+    </div>
+
+    <div class="signup-link">
+        New to Connecto? <a href="signup.html">Create account</a>
+    </div>
+
+    <div class="login-info">
+        <strong>Demo Account:</strong><br>
+        Email: demo@connecto.com<br>
+        Password: demo123
+    </div>
+</div>
+
+
+<!-- ===== FEATURE MODALS ===== -->
+<!-- LIVE TRACKING MODAL -->
+<div id="trackingModal" class="feature-modal" onclick="if(event.target === this) closeFeatureModal('tracking')">
+    <div class="feature-modal-content">
+        <button class="feature-modal-close" onclick="closeFeatureModal('tracking')">✕</button>
+        <div class="feature-preview-image">
+            <img src="https://images.unsplash.com/photo-1569163139394-de4798aa62b2?w=600&h=300&fit=crop" alt="Live Tracking Demo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%22%23064E8F%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2338bdf8%22 font-size=%2232%22 font-weight=%22bold%22 font-family=%22sans-serif%22%3E🗺️ Live Map Preview%3C/text%3E%3C/svg%3E'">
+        </div>
+        <h2 class="feature-modal-title">Live Tracking</h2>
+        <p class="feature-modal-subtitle">Real-time station monitoring & GPS navigation</p>
+        <div class="feature-modal-description">
+            🗺️ When logged in, you'll see a live map with all available charging stations near you.<br><br>
+            ⚡ Features include: Real-time availability, GPS navigation, station ratings, and charging speed info.<br><br>
+            📍 Updates every 10 seconds with current occupancy data from our network.
+        </div>
+        <p style="font-size: 14px; color: rgba(219,234,254,0.7); text-align: center;">✅ Sign in to access full features</p>
+        <div class="feature-modal-actions">
+            <button class="modal-action-btn login" onclick="openLogin(); closeFeatureModal('tracking'); SoundManager.playClick();">Login Now</button>
+            <button class="modal-action-btn explore" onclick="closeFeatureModal('tracking'); SoundManager.playHover();">Explore More</button>
+        </div>
+        <p class="feature-modal-info">Demo account: demo@connecto.com / demo123</p>
+    </div>
+</div>
+
+<!-- INSTANT BOOKING MODAL -->
+<div id="bookingModal" class="feature-modal" onclick="if(event.target === this) closeFeatureModal('booking')">
+    <div class="feature-modal-content">
+        <button class="feature-modal-close" onclick="closeFeatureModal('booking')">✕</button>
+        <div class="feature-preview-image">
+            <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=300&fit=crop" alt="Booking Demo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%220F4C3A%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2322c55e%22 font-size=%2232%22 font-weight=%22bold%22 font-family=%22sans-serif%22%3E📅 Booking UI%3C/text%3E%3C/svg%3E'">
+        </div>
+        <h2 class="feature-modal-title">Instant Booking</h2>
+        <p class="feature-modal-subtitle">One-tap charging slot reservation</p>
+        <div class="feature-modal-description">
+            📅 Select a charging station and pick from available time slots.<br><br>
+            ⏱️ Booking takes just 2 seconds! Choose your preferred duration and power level.<br><br>
+            🔔 Receive instant confirmation with directions to the station and real-time updates.
+        </div>
+        <p style="font-size: 14px; color: rgba(219,234,254,0.7); text-align: center;">✅ Sign in to access full features</p>
+        <div class="feature-modal-actions">
+            <button class="modal-action-btn login" onclick="openLogin(); closeFeatureModal('booking'); SoundManager.playClick();">Login Now</button>
+            <button class="modal-action-btn explore" onclick="closeFeatureModal('booking'); SoundManager.playHover();">Explore More</button>
+        </div>
+        <p class="feature-modal-info">No cancellation fees for bookings cancelled 1 hour before</p>
+    </div>
+</div>
+
+<!-- SMART DASHBOARD MODAL -->
+<div id="dashboardModal" class="feature-modal" onclick="if(event.target === this) closeFeatureModal('dashboard')">
+    <div class="feature-modal-content">
+        <button class="feature-modal-close" onclick="closeFeatureModal('dashboard')">✕</button>
+        <div class="feature-preview-image">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=300&fit=crop" alt="Dashboard Demo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 300%22%3E%3Crect fill=%22%23362B5F%22 width=%22600%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2306b6d4%22 font-size=%2232%22 font-weight=%22bold%22 font-family=%22sans-serif%22%3E📊 Analytics%3C/text%3E%3C/svg%3E'">
+        </div>
+        <h2 class="feature-modal-title">Smart Dashboard</h2>
+        <p class="feature-modal-subtitle">Track your charging analytics & insights</p>
+        <div class="feature-modal-description">
+            📊 View your complete charging history with detailed analytics.<br><br>
+            💡 Get AI-powered recommendations for optimal charging times to save money.<br><br>
+            🌍 Track your environmental impact: See how many emissions you've saved with smart charging.
+        </div>
+        <p style="font-size: 14px; color: rgba(219,234,254,0.7); text-align: center;">✅ Sign in to access full features</p>
+        <div class="feature-modal-actions">
+            <button class="modal-action-btn login" onclick="openLogin(); closeFeatureModal('dashboard'); SoundManager.playClick();">Login Now</button>
+            <button class="modal-action-btn explore" onclick="closeFeatureModal('dashboard'); SoundManager.playHover();">Explore More</button>
+        </div>
+        <p class="feature-modal-info">Premium analytics available with Connecto Pro</p>
+    </div>
+</div>
+
+<!-- ===== LOGIN PANEL ===== -->
+
+<script>
+/* ===== SOUND EFFECTS SYSTEM ===== */
+const SoundManager = {
+    enabled: localStorage.getItem('soundEnabled') !== 'false',
+    audioContext: null,
+
+    init() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const btn = document.getElementById('soundToggle');
+            if (btn) {
+                btn.innerHTML = this.enabled ? '🔊' : '🔇';
+                btn.addEventListener('click', () => this.toggle());
+            }
+        } catch (e) {
+            console.warn('Audio context not available');
+        }
+    },
+
+    toggle() {
+        this.enabled = !this.enabled;
+        localStorage.setItem('soundEnabled', this.enabled);
+        const btn = document.getElementById('soundToggle');
+        if (btn) btn.innerHTML = this.enabled ? '🔊' : '🔇';
+    },
+
+    playHover() {
+        if (!this.enabled || !this.audioContext) return;
+        try {
+            const now = this.audioContext.currentTime;
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            osc.frequency.value = 520;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        } catch (e) {}
+    },
+
+    playClick() {
+        if (!this.enabled || !this.audioContext) return;
+        try {
+            const now = this.audioContext.currentTime;
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            osc.frequency.setValueAtTime(640, now);
+            osc.frequency.exponentialRampToValueAtTime(420, now + 0.15);
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.06, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+        } catch (e) {}
+    },
+
+    playSuccess() {
+        if (!this.enabled || !this.audioContext) return;
+        try {
+            const now = this.audioContext.currentTime;
+            const osc = this.audioContext.createOscillator();
+            const gain = this.audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(this.audioContext.destination);
+            osc.frequency.setValueAtTime(720, now);
+            osc.frequency.exponentialRampToValueAtTime(560, now + 0.2);
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        } catch (e) {}
+    }
+};
+
+/* ===== EV CHARGING BACKGROUND ===== */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+const mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+window.addEventListener('pointermove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+});
+
+// Background image is handled by CSS
+// Particle animation disabled to display background image
+
+/* ===== NAVBAR SCROLL EFFECT ===== */
+window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
+    }
+    
+    /* PARALLAX EFFECT - Hero background moves slower than scroll */
+    const scrollY = window.scrollY;
+    const hero = document.querySelector('.hero');
+    if (hero && scrollY < window.innerHeight) {
+        hero.style.setProperty('--parallax-offset', scrollY * 0.5 + 'px');
+    }
+});
+
+/* ===== INTERSECTION OBSERVER FOR SCROLL ANIMATIONS ===== */
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            /* Staggered animation delay for sequential appearance */
+            setTimeout(() => {
+                entry.target.classList.add('scroll-in');
+            }, index * 100);
+            observer.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.scroll-in').forEach(el => observer.observe(el));
+
+/* ===== LOGIN FUNCTIONS ===== */
+function openLogin() {
+    document.getElementById("loginBox").classList.add("active");
+    SoundManager.playClick();
+}
+
+function closeLogin() {
+    document.getElementById("loginBox").classList.remove("active");
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+    
+    if (tab === 'email') {
+        document.getElementById('emailForm').classList.add('active');
+        event.target.classList.add('active');
+    } else {
+        document.getElementById('phoneForm').classList.add('active');
+        event.target.classList.add('active');
+    }
+}
+
+function login() {
+    const email = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+        SoundManager.playHover();
+        alert("⚠️ Please fill all fields");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+        SoundManager.playSuccess();
+        if (document.getElementById("rememberMe").checked) {
+            localStorage.setItem("rememberUser", email);
+        }
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("currentUser", user.name || email);
+        alert("✅ Login successful");
+        window.location.href = "dashboard.html";
+    } else {
+        SoundManager.playHover();
+        alert("❌ Invalid credentials");
+    }
+}
+
+function togglePassword() {
+    const pass = document.getElementById("password");
+    pass.type = pass.type === "password" ? "text" : "password";
+    SoundManager.playHover();
+}
+
+let otpCode = "";
+
+function sendOTP() {
+    const phone = document.getElementById("phoneLogin").value;
+    if (phone.length < 10) {
+        SoundManager.playHover();
+        alert("Enter valid phone number");
+        return;
+    }
+    otpCode = Math.floor(1000 + Math.random() * 9000).toString();
+    SoundManager.playClick();
+    alert("OTP (demo): " + otpCode);
+}
+
+function verifyOTP() {
+    const otp = document.getElementById("otpInput").value;
+    if (otp === otpCode) {
+        SoundManager.playSuccess();
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("currentUser", "PhoneUser");
+        alert("✅ Login successful");
+        window.location.href = "dashboard.html";
+    } else {
+        SoundManager.playHover();
+        alert("❌ Wrong OTP");
+    }
+}
+
+function forgotPassword() {
+    const email = prompt("Enter your registered email:");
+    if (!email) return;
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    const user = users.find(u => u.email === email);
+    if (user) {
+        SoundManager.playClick();
+        alert("Password: " + user.password);
+    } else {
+        SoundManager.playHover();
+        alert("User not found");
+    }
+}
+
+function handleCTASignup() {
+    const email = document.getElementById("ctaEmail").value;
+    if (email) {
+        alert("Thanks for subscribing! Check your email.");
+        document.getElementById("ctaEmail").value = "";
+    }
+}
+
+/* ===== INITIALIZATION ===== */
+window.addEventListener('load', () => {
+    SoundManager.init();
+
+    // Demo user
+    if (!localStorage.getItem("users")) {
+        localStorage.setItem("users", JSON.stringify([
+            { name: "Demo User", email: "demo@connecto.com", phone: "9999999999", password: "demo123" }
+        ]));
+    }
+
+    // Sound effects on interactions
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('mouseenter', () => SoundManager.playHover());
+    });
+});
+
+// Close login on outside click
+document.addEventListener('click', (e) => {
+    const panel = document.getElementById('loginBox');
+    if (panel.classList.contains('active') && !panel.contains(e.target) && !e.target.closest('.nav-cta')) {
+        closeLogin();
+    }
+});
+
+// Enter key support
+document.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        if (document.getElementById('emailForm').classList.contains('active')) {
+            login();
+        } else if (document.getElementById('phoneForm').classList.contains('active')) {
+            verifyOTP();
+        }
+    }
+});
+
+/* ===== FEATURE MODAL FUNCTIONS ===== */
+/* Opens feature preview modal - Shows demo of features without forcing login */
+function openFeatureModal(feature) {
+    try {
+        SoundManager.playClick();
+        let modalId = '';
+        
+        if (feature === 'tracking') {
+            modalId = 'trackingModal';
+        } else if (feature === 'booking') {
+            modalId = 'bookingModal';
+        } else if (feature === 'dashboard') {
+            modalId = 'dashboardModal';
+        }
+        
+        if (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Animate modal content
+                const content = modal.querySelector('.feature-modal-content');
+                if (content) {
+                    content.classList.add('active');
+                }
+            }
+        }
+    } catch (e) {
+        console.error("openFeatureModal error:", e);
+    }
+}
+
+/* Closes feature preview modal - Non-destructive close */
+function closeFeatureModal(feature) {
+    try {
+        SoundManager.playClick();
+        let modalId = '';
+        
+        if (feature === 'tracking') {
+            modalId = 'trackingModal';
+        } else if (feature === 'booking') {
+            modalId = 'bookingModal';
+        } else if (feature === 'dashboard') {
+            modalId = 'dashboardModal';
+        }
+        
+        if (modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        }
+    } catch (e) {
+        console.error("closeFeatureModal error:", e);
+    }
+}
+
+/* Close modal when clicking outside (on backdrop) */
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('feature-modal') && e.target === e.currentTarget) {
+        const modal = e.target;
+        const feature = modal.id.replace('Modal', '');
+        closeFeatureModal(feature);
+    }
+});
+
+/* ESC key closes modals */
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.feature-modal.active').forEach(modal => {
+            const feature = modal.id.replace('Modal', '');
+            closeFeatureModal(feature);
+        });
+    }
+});
+
+</script>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Connecto Signup</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0a0f1a;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:#1a2233;
+    padding:30px;
+    border-radius:10px;
+    width:300px;
+    text-align:center;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border:none;
+    border-radius:5px;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#38bdf8;
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0ea5e9;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Create Account</h2>
+
+<input type="text" id="name" placeholder="Full Name" required>
+
+<input type="email" id="email" placeholder="Enter Email" required>
+
+<input type="text" id="phone" placeholder="Phone Number" required>
+
+<input type="password" id="password" placeholder="Enter Password" required>
+
+<button onclick="signup()">Create Account</button>
+<p>Already have account? <a href="connecto.html" style="color:#38bdf8;">Login</a></p>
+
+</div>
+
+<script>
+
+function signup(){
+
+    console.log("Signup clicked"); // debug
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    console.log(name, email, phone, password); // debug
+
+    // 🔒 Validation
+    if(name === "" || email === "" || phone === "" || password === ""){
+        alert("❌ Please fill all fields");
+        return;
+    }
+
+    if(!email.includes("@")){
+        alert("❌ Enter valid email");
+        return;
+    }
+
+    if(phone.length < 10 || isNaN(phone)){
+        alert("❌ Enter valid phone number");
+        return;
+    }
+
+    if(password.length < 6){
+        alert("❌ Password must be at least 6 characters");
+        return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    // 🔁 Check if user already exists
+    let exists = users.find(u => u.email === email);
+
+    if(exists){
+        alert("❌ User already exists");
+        return;
+    }
+
+    // ✅ Save user
+    users.push({
+        name: name,
+        email: email,
+        phone: phone,
+        password: password
+    });
+
+    localStorage.setItem("users", JSON.stringify(users));
+
+    console.log("Saved users:", users); // debug
+
+    alert("✅ Account Created Successfully!");
+
+    // 👉 Redirect to login page
+    window.location.href = "connecto.html";
+}
+
+</script>
+
+</body>
+</html>
